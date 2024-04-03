@@ -1,4 +1,4 @@
- <!--   MPD XML Starter code - main diet 2023-2024   -->
+<!--   MPD XML Starter code - main diet 2023-2024   -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:map="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent" android:layout_height="fill_parent" android:fillViewport="true" android:id="@+id/scrollView">
     <!--  Starting Screen Layout  -->
     <LinearLayout
@@ -10,9 +10,9 @@
             android:layout_height="wrap_content"
             android:id="@+id/viewSwitcher">
             <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -57,13 +57,6 @@
                             android:layout_height="match_parent"
                             android:textAlignment="center"
                             android:textSize="20sp" />
-                        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-                            xmlns:map="http://schemas.android.com/apk/res-auto"
-                            android:id="@+id/map"
-                            android:name="com.google.android.gms.maps.SupportMapFragment"
-                            android:layout_width="match_parent"
-                            android:layout_height="200dp"
-                            map:mapType="normal"/>
                     </LinearLayout>
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -164,6 +157,16 @@
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <androidx.fragment.app.FragmentContainerView
+                        android:id="@+id/map"
+                        android:name="com.google.android.gms.maps.SupportMapFragment"
+                        android:layout_width="match_parent"
+                        android:layout_height="300dp"/>
+                </LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     >
                     <Button
@@ -229,121 +232,121 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="vertical">
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="Glasgow"
-                                android:textAlignment="center"
-                                android:textAllCaps="true"
-                                android:textSize="34sp"
-                                android:textStyle="bold|italic" />
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Glasgow"
+                            android:textAlignment="center"
+                            android:textAllCaps="true"
+                            android:textSize="34sp"
+                            android:textStyle="bold|italic" />
 
-                            <TextView
-                                android:id="@+id/glasgowFor"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:textAlignment="center"
-                                android:textSize="20sp"
-                                />
-                        </LinearLayout>
-                        <LinearLayout
+                        <TextView
+                            android:id="@+id/glasgowFor"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical">
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="London"
-                                android:textAlignment="center"
-                                android:textAllCaps="true"
-                                android:textSize="34sp"
-                                android:textStyle="bold|italic" />
-                            <TextView
-                                android:id="@+id/londonFor"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:textAlignment="center"
-                                android:textSize="20sp"/>
-                        </LinearLayout>
-                        <LinearLayout
+                            android:layout_height="wrap_content"
+                            android:textAlignment="center"
+                            android:textSize="20sp"
+                            />
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+                        <TextView
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical">
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="New York"
-                                android:textAlignment="center"
-                                android:textAllCaps="true"
-                                android:textSize="34sp"
-                                android:textStyle="bold|italic" />
-                            <TextView
-                                android:id="@+id/newyorkFor"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:textAlignment="center"
-                                android:textSize="20sp"/>
-                        </LinearLayout>
-                        <LinearLayout
+                            android:layout_height="wrap_content"
+                            android:text="London"
+                            android:textAlignment="center"
+                            android:textAllCaps="true"
+                            android:textSize="34sp"
+                            android:textStyle="bold|italic" />
+                        <TextView
+                            android:id="@+id/londonFor"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical">
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="Oman"
-                                android:textAlignment="center"
-                                android:textAllCaps="true"
-                                android:textSize="34sp"
-                                android:textStyle="bold|italic" />
-                            <TextView
-                                android:id="@+id/omanFor"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:textAlignment="center"
-                                android:textSize="20sp"/>
-                        </LinearLayout>
-                        <LinearLayout
+                            android:layout_height="wrap_content"
+                            android:textAlignment="center"
+                            android:textSize="20sp"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+                        <TextView
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical">
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="Mauritius"
-                                android:textAlignment="center"
-                                android:textAllCaps="true"
-                                android:textSize="34sp"
-                                android:textStyle="bold|italic" />
-                            <TextView
-                                android:id="@+id/mauritiusFor"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:textAlignment="center"
-                                android:textSize="20sp"/>
-                        </LinearLayout>
-                        <LinearLayout
+                            android:layout_height="wrap_content"
+                            android:text="New York"
+                            android:textAlignment="center"
+                            android:textAllCaps="true"
+                            android:textSize="34sp"
+                            android:textStyle="bold|italic" />
+                        <TextView
+                            android:id="@+id/newyorkFor"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical">
-                            <TextView
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:text="Bangladesh"
-                                android:textAlignment="center"
-                                android:textAllCaps="true"
-                                android:textSize="34sp"
-                                android:textStyle="bold|italic" />
-                            <TextView
-                                android:id="@+id/bangladeshFor"
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:textAlignment="center"
-                                android:textSize="20sp"/>
-                        </LinearLayout>
-                    </ViewFlipper>
+                            android:layout_height="wrap_content"
+                            android:textAlignment="center"
+                            android:textSize="20sp"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Oman"
+                            android:textAlignment="center"
+                            android:textAllCaps="true"
+                            android:textSize="34sp"
+                            android:textStyle="bold|italic" />
+                        <TextView
+                            android:id="@+id/omanFor"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textAlignment="center"
+                            android:textSize="20sp"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Mauritius"
+                            android:textAlignment="center"
+                            android:textAllCaps="true"
+                            android:textSize="34sp"
+                            android:textStyle="bold|italic" />
+                        <TextView
+                            android:id="@+id/mauritiusFor"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textAlignment="center"
+                            android:textSize="20sp"/>
+                    </LinearLayout>
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="vertical">
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Bangladesh"
+                            android:textAlignment="center"
+                            android:textAllCaps="true"
+                            android:textSize="34sp"
+                            android:textStyle="bold|italic" />
+                        <TextView
+                            android:id="@+id/bangladeshFor"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:textAlignment="center"
+                            android:textSize="20sp"/>
+                    </LinearLayout>
+                </ViewFlipper>
 
-                </LinearLayout>
+            </LinearLayout>
         </ViewSwitcher>
     </LinearLayout>
 </ScrollView>

@@ -38,10 +38,8 @@ import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback{
     private ScrollView scrollView;
-    private GoogleMap mMap;
-    private FragmentContainerView fragmentContainerView;
     private ViewSwitcher viewSwitcher;
     private ViewFlipper weatherViewFlipper1, weatherViewFlipper2;
     private Button backButton, nextButton1, prevButton1, nextButton2, prevButton2, forButton;
@@ -100,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         weatherViewFlipper1 = findViewById(R.id.weatherViewFlipper1);
         weatherViewFlipper2 = findViewById(R.id.weatherFlipper2);
-        fragmentContainerView = (FragmentContainerView) findViewById(R.id.map);
+
 
         // Set up link to buttons
         forButton = findViewById(R.id.forButton);
@@ -121,8 +119,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         if (mapFragment != null) {
-            mapFragment.getMapAsync(this);
-            Log.d("MyTag", "maps");
+            mapFragment.getMapAsync(this); // 'this' refers to the OnMapReadyCallback
         }
     }
 
@@ -166,15 +163,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
     @Override
-    public void onMapReady(GoogleMap googleMap) {
-        mMap = googleMap;
-
-        // Add a marker in Sydney, Australia, and move the camera.
+    public void onMapReady(@NonNull GoogleMap mapFragment) {
+        // Example: Add a marker in Sydney, Australia, and move the camera
         LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        mapFragment.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
+        mapFragment.moveCamera(CameraUpdateFactory.newLatLng(sydney));
     }
-
     private class Task2 implements Runnable {
         private String[] urls;
 
