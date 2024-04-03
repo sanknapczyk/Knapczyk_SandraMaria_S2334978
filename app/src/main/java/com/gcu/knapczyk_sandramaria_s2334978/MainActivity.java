@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         weatherViewFlipper1 = findViewById(R.id.weatherViewFlipper1);
         weatherViewFlipper2 = findViewById(R.id.weatherFlipper2);
-        fragmentContainerView = (FragmentContainerView) findViewById(R.id.fragment_container_view);
+        fragmentContainerView = (FragmentContainerView) findViewById(R.id.map);
 
         // Set up link to buttons
         forButton = findViewById(R.id.forButton);
@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.fragment_container_view);
+                .findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this);
             Log.d("MyTag", "maps");
