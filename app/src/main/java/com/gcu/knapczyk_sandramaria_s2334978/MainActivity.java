@@ -39,14 +39,22 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback{
+    private GoogleMap googleMap;
     private ScrollView scrollView;
     private ViewSwitcher viewSwitcher;
     private ViewFlipper weatherViewFlipper1, weatherViewFlipper2;
     private Button backButton, nextButton1, prevButton1, nextButton2, prevButton2, forButton;
 
     private TextView glasgowObs, londonObs, newyorkObs, omanObs, mauritiusObs, bangladeshObs,glasgowFor, londonFor, newyorkFor, omanFor, mauritiusFor, bangladeshFor;
-//    private String observationUrl = "https://weather-broker-cdn.api.bbci.co.uk/en/observation/rss/2648579";
-//    private String observationUrl1 = "https://weather-broker-cdn.api.bbci.co.uk/en/observation/rss/2643743";
+    private final LatLng[] CITY_COORDINATES = new LatLng[]{
+            new LatLng(55.8642, -4.2518), // Glasgow
+            new LatLng(51.5074, -0.1278), // London
+            new LatLng(40.7128, -74.0060), // New York
+            new LatLng(20.5883, 56.1302), // Oman
+            new LatLng(-20.4047, 57.4117), // Mauritius
+            new LatLng(24.2479, 90.4269)  // Bangladesh
+    };
+
     private String[] observationUrls = {
             "https://weather-broker-cdn.api.bbci.co.uk/en/observation/rss/2648579",
             "https://weather-broker-cdn.api.bbci.co.uk/en/observation/rss/2643743",
@@ -133,9 +141,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.d("MyTag", "go to forecast screen");
         } else if (v == nextButton1) {
             weatherViewFlipper1.showNext();
+            updateMapMarker(weatherViewFlipper1.getDisplayedChild());
             Log.d("MyTag", "obs next screen");
         } else if (v == prevButton1) {
             weatherViewFlipper1.showPrevious();
+            updateMapMarker(weatherViewFlipper1.getDisplayedChild());
             Log.d("MyTag", "obs prev screen");
         } else if (v == nextButton2) {
             weatherViewFlipper2.showNext();
@@ -162,13 +172,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             new Thread(new Task(forecastUrls)).start();
 
     }
+
     @Override
-    public void onMapReady(@NonNull GoogleMap mapFragment) {
-        // Example: Add a marker in Sydney, Australia, and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mapFragment.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mapFragment.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    public void onMapReady(@NonNull GoogleMap googleMap) {
+        this.googleMap = googleMap;
+        updateMapMarker(weatherViewFlipper1.getDisplayedChild());
     }
+
+    private void updateMapMarker(int cityIndex) {
+        LatLng cityLocation = CITY_COORDINATES[cityIndex];
+        googleMap.clear(); // Remove previous markers
+        googleMap.addMarker(new MarkerOptions().position(cityLocation).title("Marker in city"));
+        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(cityLocation, 10));
+    }
+
     private class Task2 implements Runnable {
         private String[] urls;
 
