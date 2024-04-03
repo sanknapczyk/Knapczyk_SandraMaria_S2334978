@@ -51,6 +51,9 @@
                             android:textAllCaps="true"
                             android:textSize="34sp"
                             android:textStyle="bold|italic" />
+                        <ImageView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"></ImageView>
                         <TextView
                             android:id="@+id/glasgowObs"
                             android:layout_width="match_parent"
@@ -166,25 +169,27 @@
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="50dp"
                     android:orientation="horizontal"
                     >
-                    <Button
+
+                    <ImageButton
                         android:id="@+id/buttonPrevious1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Prev city"
+                        android:layout_width="65dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/arrow_prev"
                         />
                     <View
                         android:layout_width="0dp"
                         android:layout_height="0dp"
                         android:layout_weight="1" />
-                    <Button
-                        android:id="@+id/buttonNext1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
 
-                        android:text="Next city" />
+                    <ImageButton
+                        android:id="@+id/buttonNext1"
+                        android:layout_width="65dp"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/arrow_next"
+                         />
                 </LinearLayout>
             </LinearLayout>
             <LinearLayout
@@ -209,7 +214,7 @@
                         android:id="@+id/buttonPrevious2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Previous"
+                        map:icon="@drawable/arrow_prev"
                         android:layout_weight="1"/>
                     <Button
                         android:layout_width="wrap_content"
@@ -221,7 +226,7 @@
                         android:id="@+id/buttonNext2"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Next"
+                        map:icon="@drawable/arrow_next"
                         android:layout_weight="1" />
                 </LinearLayout>
                 <ViewFlipper

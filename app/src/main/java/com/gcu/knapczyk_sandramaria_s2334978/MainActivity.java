@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         if (mapFragment != null) {
-            mapFragment.getMapAsync(this); // 'this' refers to the OnMapReadyCallback
+            mapFragment.getMapAsync(this); // to the OnMapReadyCallback
         }
     }
 
@@ -511,6 +511,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (googleMap != null) {
+            updateMapMarker(weatherViewFlipper1.getDisplayedChild());
+        }
+    }
 
 
 }
