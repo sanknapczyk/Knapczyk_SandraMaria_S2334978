@@ -19,7 +19,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.gcu.sk"
+        applicationId = "com.gcu.knapczyk_sandramaria_s2334978"
         minSdk = 24
         targetSdk = 33
         versionCode = 1

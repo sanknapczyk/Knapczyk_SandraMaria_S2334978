@@ -6,9 +6,12 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
 
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -43,8 +46,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ScrollView scrollView;
     private ViewSwitcher viewSwitcher;
     private ViewFlipper weatherViewFlipper1, weatherViewFlipper2;
-    private Button backButton, nextButton1, prevButton1, nextButton2, prevButton2, forButton;
-
+    private Button backButton, forButton;
+    private ImageButton nextButton1, prevButton1, nextButton2, prevButton2;
+    private ImageView dayIcon;
     private TextView glasgowObs, londonObs, newyorkObs, omanObs, mauritiusObs, bangladeshObs,glasgowFor, londonFor, newyorkFor, omanFor, mauritiusFor, bangladeshFor;
     private final LatLng[] CITY_COORDINATES = new LatLng[]{
             new LatLng(55.8642, -4.2518), // Glasgow
@@ -82,6 +86,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
         // Set up the links to the graphical components
         glasgowObs = (TextView) findViewById(R.id.glasgowObs);
         londonObs = (TextView) findViewById(R.id.londonObs);
@@ -98,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // Set up link to layout views
         scrollView = (ScrollView) findViewById(R.id.scrollView);
+        scrollView.setBackgroundColor(getResources().getColor(R.color.Black));
         viewSwitcher = findViewById(R.id.viewSwitcher);
         if (viewSwitcher == null) {
             Toast.makeText(getApplicationContext(), "Null ViewSwitcher",
