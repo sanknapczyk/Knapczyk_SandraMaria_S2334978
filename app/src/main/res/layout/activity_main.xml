@@ -1,5 +1,6 @@
 <!--   MPD XML Starter code - main diet 2023-2024   -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:map="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent" android:layout_height="fill_parent" android:fillViewport="true" android:id="@+id/scrollView">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:map="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent" android:layout_height="fill_parent" android:fillViewport="true"
+    android:id="@+id/scrollView">
     <!--  Starting Screen Layout  -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -28,58 +29,53 @@
                     android:textAlignment="center"
                     android:textSize="12sp"/>
 
-                <Button
-                    android:id="@+id/forButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="10sp"
-                    android:backgroundTint="@color/White"
-                    android:text="FORECAST"
-                    android:textColor="@color/Black" />
-                <ViewFlipper android:id="@+id/weatherViewFlipper1"
+                <Spinner
+                    android:id="@+id/location_spinner"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    android:layout_height="55dp"
+                    android:textAlignment="center"
+                    android:layout_marginTop="5dp"
+                    style="@style/Widget.AppCompat.Spinner.DropDown.ActionBar"
+                    />
+
+                <ViewFlipper
+                    android:id="@+id/weatherViewFlipper1"
+                    android:layout_width="match_parent"
+                    android:layout_height="125dp"
                     android:layout_marginTop="10dp">
 
                     <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:orientation="vertical">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Glasgow"
-                            android:textAlignment="center"
-                            android:textAllCaps="true"
-                            android:textSize="34sp"
-                            android:textStyle="bold|italic" />
 
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="30dp"
                             android:orientation="horizontal">
+
                             <ImageView
-                                android:id="@+id/dayIcon"
+                                android:id="@+id/dayIcon1"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:src="@drawable/day"
                                 map:tint="@color/White" />
+
                             <TextView
-                                android:id="@+id/glasgowObs"
+                                android:id="@+id/glasgowDay"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:text=""
-                                android:textSize="20sp"/>
+                                android:textSize="20sp" />
                         </LinearLayout>
+
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="30dp"
                             android:orientation="horizontal">
 
                             <ImageView
-                                android:id="@+id/temperatureIcon"
+                                android:id="@+id/temperatureIcon1"
                                 android:layout_width="400dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
@@ -87,146 +83,507 @@
                                 map:tint="@color/White" />
 
                             <TextView
-
+                                android:id="@+id/glasgowTemperature"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:layout_weight="1"
                                 android:text=""
                                 android:textSize="20sp" />
                         </LinearLayout>
+
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="30dp"
                             android:orientation="horizontal">
 
                             <ImageView
-                                android:id="@+id/pressureIcon"
+                                android:id="@+id/pressureIcon1"
                                 android:layout_width="398dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:src="@drawable/pressure"
                                 map:tint="@color/White" />
-                            <TextView
 
+                            <TextView
+                                android:id="@+id/glasgowPressure"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
+                                android:layout_weight="1"
                                 android:text=""
-                                android:textSize="20sp"
-                                android:layout_weight="1"/>
+                                android:textSize="20sp" />
                         </LinearLayout>
+
                         <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="40dp"
+                            android:layout_height="30dp"
                             android:orientation="horizontal">
+
                             <ImageView
-                                android:id="@+id/windIcon"
+                                android:id="@+id/windIcon1"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:src="@drawable/wind"
                                 map:tint="@color/White" />
-                            <TextView
 
+                            <TextView
+                                android:id="@+id/glasgowWind"
                                 android:layout_width="match_parent"
                                 android:layout_height="match_parent"
                                 android:text=""
-                                android:textSize="20sp"/>
+                                android:textSize="20sp" />
                         </LinearLayout>
 
                     </LinearLayout>
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="vertical">
-                        <TextView
+
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="London"
-                            android:textAlignment="center"
-                            android:textAllCaps="true"
-                            android:textSize="34sp"
-                            android:textStyle="bold|italic" />
-                        <TextView
-                            android:id="@+id/londonObs"
+                            android:layout_height="30dp"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/dayIcon2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/day"
+                                map:tint="@color/White" />
+
+                            <TextView
+                                android:id="@+id/londonDay"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:text=""
+                                android:textSize="20sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:textAlignment="center"
-                            android:textSize="20sp"/>
+                            android:layout_height="30dp"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/temperatureIcon2"
+                                android:layout_width="400dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:src="@drawable/temperature"
+                                map:tint="@color/White" />
+
+                            <TextView
+                                android:id="@+id/londonTemperature"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:text=""
+                                android:textSize="20sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/pressureIcon2"
+                                android:layout_width="398dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:src="@drawable/pressure"
+                                map:tint="@color/White" />
+
+                            <TextView
+                                android:id="@+id/londonPressure"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:text=""
+                                android:textSize="20sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/windIcon2"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/wind"
+                                map:tint="@color/White" />
+
+                            <TextView
+                                android:id="@+id/londonWind"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:text=""
+                                android:textSize="20sp" />
+                        </LinearLayout>
                     </LinearLayout>
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="vertical">
-                        <TextView
+
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="New York"
-                            android:textAlignment="center"
-                            android:textAllCaps="true"
-                            android:textSize="34sp"
-                            android:textStyle="bold|italic" />
-                        <TextView
-                            android:id="@+id/newyorkObs"
+                            android:layout_height="30dp"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/dayIcon3"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/day"
+                                map:tint="@color/White" />
+
+                            <TextView
+                                android:id="@+id/newYorkDay"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:text=""
+                                android:textSize="20sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:textAlignment="center"
-                            android:textSize="20sp"/>
+                            android:layout_height="30dp"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/temperatureIcon3"
+                                android:layout_width="400dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:src="@drawable/temperature"
+                                map:tint="@color/White" />
+
+                            <TextView
+                                android:id="@+id/newYorkTemperature"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:text=""
+                                android:textSize="20sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/pressureIcon3"
+                                android:layout_width="398dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:src="@drawable/pressure"
+                                map:tint="@color/White" />
+
+                            <TextView
+                                android:id="@+id/newYorkPressure"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:text=""
+                                android:textSize="20sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/windIcon3"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/wind"
+                                map:tint="@color/White" />
+
+                            <TextView
+                                android:id="@+id/newYorkWind"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:text=""
+                                android:textSize="20sp" />
+                        </LinearLayout>
                     </LinearLayout>
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="vertical">
-                        <TextView
+
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Oman"
-                            android:textAlignment="center"
-                            android:textAllCaps="true"
-                            android:textSize="34sp"
-                            android:textStyle="bold|italic" />
-                        <TextView
-                            android:id="@+id/omanObs"
+                            android:layout_height="30dp"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/dayIcon4"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/day"
+                                map:tint="@color/White" />
+
+                            <TextView
+                                android:id="@+id/omanDay"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:text=""
+                                android:textSize="20sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:textAlignment="center"
-                            android:textSize="20sp"/>
+                            android:layout_height="30dp"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/temperatureIcon4"
+                                android:layout_width="400dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:src="@drawable/temperature"
+                                map:tint="@color/White" />
+
+                            <TextView
+                                android:id="@+id/omanTemperature"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:text=""
+                                android:textSize="20sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/pressureIcon4"
+                                android:layout_width="398dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:src="@drawable/pressure"
+                                map:tint="@color/White" />
+
+                            <TextView
+                                android:id="@+id/omanPressure"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:text=""
+                                android:textSize="20sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/windIcon4"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/wind"
+                                map:tint="@color/White" />
+
+                            <TextView
+                                android:id="@+id/omanWind"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:text=""
+                                android:textSize="20sp" />
+                        </LinearLayout>
                     </LinearLayout>
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="vertical">
-                        <TextView
+
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Mauritius"
-                            android:textAlignment="center"
-                            android:textAllCaps="true"
-                            android:textSize="34sp"
-                            android:textStyle="bold|italic" />
-                        <TextView
-                            android:id="@+id/mauritiusObs"
+                            android:layout_height="30dp"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/dayIcon5"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/day"
+                                map:tint="@color/White" />
+
+                            <TextView
+                                android:id="@+id/mauritiusDay"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:text=""
+                                android:textSize="20sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:textAlignment="center"
-                            android:textSize="20sp"/>
+                            android:layout_height="30dp"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/temperatureIcon5"
+                                android:layout_width="400dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:src="@drawable/temperature"
+                                map:tint="@color/White" />
+
+                            <TextView
+                                android:id="@+id/mauritiusTemperature"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:text=""
+                                android:textSize="20sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/pressureIcon5"
+                                android:layout_width="398dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:src="@drawable/pressure"
+                                map:tint="@color/White" />
+
+                            <TextView
+                                android:id="@+id/mauritiusPressure"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:text=""
+                                android:textSize="20sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/windIcon5"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/wind"
+                                map:tint="@color/White" />
+
+                            <TextView
+                                android:id="@+id/mauritiusWind"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:text=""
+                                android:textSize="20sp" />
+                        </LinearLayout>
                     </LinearLayout>
+
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="vertical">
-                        <TextView
+
+
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="Bangladesh"
-                            android:textAlignment="center"
-                            android:textAllCaps="true"
-                            android:textSize="34sp"
-                            android:textStyle="bold|italic" />
-                        <TextView
-                            android:id="@+id/bangladeshObs"
+                            android:layout_height="30dp"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/dayIcon6"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/day"
+                                map:tint="@color/White" />
+
+                            <TextView
+                                android:id="@+id/bangladeshDay"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:text=""
+                                android:textSize="20sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:textAlignment="center"
-                            android:textSize="20sp"/>
+                            android:layout_height="30dp"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/temperatureIcon6"
+                                android:layout_width="400dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:src="@drawable/temperature"
+                                map:tint="@color/White" />
+
+                            <TextView
+                                android:id="@+id/bangladeshTemperature"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:text=""
+                                android:textSize="20sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/pressureIcon6"
+                                android:layout_width="398dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:src="@drawable/pressure"
+                                map:tint="@color/White" />
+
+                            <TextView
+                                android:id="@+id/bangladeshPressure"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_weight="1"
+                                android:text=""
+                                android:textSize="20sp" />
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="30dp"
+                            android:orientation="horizontal">
+
+                            <ImageView
+                                android:id="@+id/windIcon6"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/wind"
+                                map:tint="@color/White" />
+
+                            <TextView
+                                android:id="@+id/bangladeshWind"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:text=""
+                                android:textSize="20sp" />
+                        </LinearLayout>
                     </LinearLayout>
                 </ViewFlipper>
                 <LinearLayout
@@ -237,14 +594,15 @@
                         android:id="@+id/map"
                         android:name="com.google.android.gms.maps.SupportMapFragment"
                         android:layout_width="match_parent"
-                        android:layout_height="300dp"
-                        android:layout_marginTop="20dp"/>
+                        android:layout_height="400dp"
+                        android:layout_gravity="center"
+                        />
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="50dp"
+                    android:layout_height="70dp"
                     android:orientation="horizontal"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginTop="10dp"
                     >
 
                     <ImageButton
@@ -252,18 +610,25 @@
                         android:layout_width="65dp"
                         android:layout_height="match_parent"
                         android:background="@drawable/arrow_prev"
-                        android:backgroundTint="@color/White" />
-                    <View
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:layout_weight="1" />
+                        android:backgroundTint="@color/White"
+                        />
+                    <Button
+                        android:id="@+id/forButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:backgroundTint="@color/White"
+                        android:text="GO TO FORECAST"
+                        android:textColor="@color/Black"
+                        android:layout_weight="1"/>
 
                     <ImageButton
                         android:id="@+id/buttonNext1"
                         android:layout_width="65dp"
                         android:layout_height="match_parent"
                         android:background="@drawable/arrow_next"
-                        android:backgroundTint="@color/White" />
+                        android:backgroundTint="@color/White"
+                        />
                 </LinearLayout>
             </LinearLayout>
             <LinearLayout
@@ -335,14 +700,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:orientation="vertical">
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:text="London"
-                            android:textAlignment="center"
-                            android:textAllCaps="true"
-                            android:textSize="34sp"
-                            android:textStyle="bold|italic" />
+
                         <TextView
                             android:id="@+id/londonFor"
                             android:layout_width="match_parent"

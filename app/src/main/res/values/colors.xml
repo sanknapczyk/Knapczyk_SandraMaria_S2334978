@@ -140,4 +140,6 @@
     <color name="DarkBlue">#00008B</color>
     <color name="Navy">#000080</color>
     <color name="Black">#000000</color>
+    <color name="SeaBlue">#9bbff4</color>
+    <color name="Land">#bbdaa4</color>
 </resources>

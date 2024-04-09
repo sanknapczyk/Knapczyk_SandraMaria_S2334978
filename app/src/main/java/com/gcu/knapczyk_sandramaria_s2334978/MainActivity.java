@@ -10,9 +10,12 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ScrollView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewSwitcher;
@@ -27,6 +30,9 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.xmlpull.v1.XmlPullParser;
@@ -48,15 +54,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private ViewFlipper weatherViewFlipper1, weatherViewFlipper2;
     private Button backButton, forButton;
     private ImageButton nextButton1, prevButton1, nextButton2, prevButton2;
-    private ImageView dayIcon;
-    private TextView glasgowObs, londonObs, newyorkObs, omanObs, mauritiusObs, bangladeshObs,glasgowFor, londonFor, newyorkFor, omanFor, mauritiusFor, bangladeshFor;
+    private Spinner locationSpinner;
+    private TextView glasgowFor, londonFor, newyorkFor, omanFor, mauritiusFor, bangladeshFor;
+    // Glasgow
+    private TextView glasgowDay, glasgowTemperature, glasgowPressure, glasgowWind;
+
+    // London
+    private TextView londonDay, londonTemperature, londonPressure, londonWind;
+
+    // New York
+    private TextView newYorkDay, newYorkTemperature, newYorkPressure, newYorkWind;
+
+    // Oman
+    private TextView omanDay, omanTemperature, omanPressure, omanWind;
+
+    // Mauritius
+    private TextView mauritiusDay, mauritiusTemperature, mauritiusPressure, mauritiusWind;
+
+    // Bangladesh
+    private TextView bangladeshDay, bangladeshTemperature, bangladeshPressure, bangladeshWind;
+
+
     private final LatLng[] CITY_COORDINATES = new LatLng[]{
             new LatLng(55.8642, -4.2518), // Glasgow
             new LatLng(51.5074, -0.1278), // London
             new LatLng(40.7128, -74.0060), // New York
-            new LatLng(20.5883, 56.1302), // Oman
+            new LatLng(20.4883, 56.2402), // Oman
             new LatLng(-20.4047, 57.4117), // Mauritius
-            new LatLng(24.2479, 90.4269)  // Bangladesh
+            new LatLng(24.2079, 90.2569)  // Bangladesh
     };
 
     private String[] observationUrls = {
@@ -78,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     };
 
     CopyOnWriteArrayList<ThreeDayForecast> forecasts = new CopyOnWriteArrayList<>();
-    CopyOnWriteArrayList<Observations> observations = new CopyOnWriteArrayList<>();
+    private Map<String, CopyOnWriteArrayList<Observations>> observationsMap = new ConcurrentHashMap<>();
 
 
     @Override
@@ -86,15 +111,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Initialize TextViews for 6 locations
+        glasgowDay = findViewById(R.id.glasgowDay);
+        glasgowTemperature = findViewById(R.id.glasgowTemperature);
+        glasgowPressure = findViewById(R.id.glasgowPressure);
+        glasgowWind = findViewById(R.id.glasgowWind);
 
+        londonDay = findViewById(R.id.londonDay);
+        londonTemperature = findViewById(R.id.londonTemperature);
+        londonPressure = findViewById(R.id.londonPressure);
+        londonWind = findViewById(R.id.londonWind);
 
-        // Set up the links to the graphical components
-        glasgowObs = (TextView) findViewById(R.id.glasgowObs);
-        londonObs = (TextView) findViewById(R.id.londonObs);
-        newyorkObs = (TextView) findViewById(R.id.newyorkObs);
-        omanObs = (TextView) findViewById(R.id.omanObs);
-        mauritiusObs = (TextView) findViewById(R.id.mauritiusObs);
-        bangladeshObs = (TextView) findViewById(R.id.bangladeshObs);
+        newYorkDay = findViewById(R.id.newYorkDay);
+        newYorkTemperature = findViewById(R.id.newYorkTemperature);
+        newYorkPressure = findViewById(R.id.newYorkPressure);
+        newYorkWind = findViewById(R.id.newYorkWind);
+
+        omanDay = findViewById(R.id.omanDay);
+        omanTemperature = findViewById(R.id.omanTemperature);
+        omanPressure = findViewById(R.id.omanPressure);
+        omanWind = findViewById(R.id.omanWind);
+
+        mauritiusDay = findViewById(R.id.mauritiusDay);
+        mauritiusTemperature = findViewById(R.id.mauritiusTemperature);
+        mauritiusPressure = findViewById(R.id.mauritiusPressure);
+        mauritiusWind = findViewById(R.id.mauritiusWind);
+
+        bangladeshDay = findViewById(R.id.bangladeshDay);
+        bangladeshTemperature = findViewById(R.id.bangladeshTemperature);
+        bangladeshPressure = findViewById(R.id.bangladeshPressure);
+        bangladeshWind = findViewById(R.id.bangladeshWind);
+
         glasgowFor = (TextView) findViewById(R.id.glasgowFor);
         londonFor = (TextView) findViewById(R.id.londonFor);
         newyorkFor = (TextView) findViewById(R.id.newyorkFor);
@@ -104,15 +151,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // Set up link to layout views
         scrollView = (ScrollView) findViewById(R.id.scrollView);
-        scrollView.setBackgroundColor(getResources().getColor(R.color.Black));
         viewSwitcher = findViewById(R.id.viewSwitcher);
         if (viewSwitcher == null) {
             Toast.makeText(getApplicationContext(), "Null ViewSwitcher",
                     Toast.LENGTH_LONG);
             Log.e(getPackageName(), "null pointer");
         }
+
+        // Initialise ViewFlippers
         weatherViewFlipper1 = findViewById(R.id.weatherViewFlipper1);
         weatherViewFlipper2 = findViewById(R.id.weatherFlipper2);
+
+        //Initialise Spinner
+        locationSpinner = findViewById(R.id.location_spinner);
+
+        // Populate the spinner
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.locations_array, R.layout.spinner_item_layout);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        locationSpinner.setAdapter(adapter);
+
+        // Set the spinner's item selected listener
+        locationSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                //Set ViewFlipper to show chosen location
+                weatherViewFlipper1.setDisplayedChild(position);
+                // Update the map location
+                updateMapLocation(position);
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Display the first child and map view by default
+                weatherViewFlipper1.setDisplayedChild(0);
+                updateMapLocation(0);
+            }
+        });
 
 
         // Set up link to buttons
@@ -147,12 +223,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startProgressForecasts();
             Log.d("MyTag", "go to forecast screen");
         } else if (v == nextButton1) {
-            weatherViewFlipper1.showNext();
-            updateMapMarker(weatherViewFlipper1.getDisplayedChild());
+            int nextPosition = (weatherViewFlipper1.getDisplayedChild() + 1) % weatherViewFlipper1.getChildCount();
+            weatherViewFlipper1.setDisplayedChild(nextPosition);
+            locationSpinner.setSelection(nextPosition);
+            updateMapLocation(nextPosition);
             Log.d("MyTag", "obs next screen");
         } else if (v == prevButton1) {
-            weatherViewFlipper1.showPrevious();
-            updateMapMarker(weatherViewFlipper1.getDisplayedChild());
+            int prevPosition = (weatherViewFlipper1.getDisplayedChild() - 1 + weatherViewFlipper1.getChildCount()) % weatherViewFlipper1.getChildCount();
+            weatherViewFlipper1.setDisplayedChild(prevPosition);
+            locationSpinner.setSelection(prevPosition);
+            updateMapLocation(prevPosition);
             Log.d("MyTag", "obs prev screen");
         } else if (v == nextButton2) {
             weatherViewFlipper2.showNext();
@@ -183,15 +263,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         this.googleMap = googleMap;
-        updateMapMarker(weatherViewFlipper1.getDisplayedChild());
+        updateMapLocation(0);
     }
 
-    private void updateMapMarker(int cityIndex) {
-        LatLng cityLocation = CITY_COORDINATES[cityIndex];
-        googleMap.clear(); // Remove previous markers
-        googleMap.addMarker(new MarkerOptions().position(cityLocation).title("Marker in city"));
-        googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(cityLocation, 10));
+    private void updateMapLocation(int position) {
+        if (googleMap == null || position < 0 || position >= CITY_COORDINATES.length) {
+            Log.e("MainActivity", "Invalid map state or position.");
+            return;
+        }
+
+        LatLng selectedLocation = CITY_COORDINATES[position];
+        googleMap.clear(); // Clear existing markers if any
+        googleMap.addMarker(new MarkerOptions().position(selectedLocation).title("Marker in " + locationSpinner.getSelectedItem().toString()));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLocation, 10)); // Zoom can be adjusted as needed
     }
+
 
     private class Task2 implements Runnable {
         private String[] urls;
@@ -205,67 +291,66 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.d("MyTag", "Task2 started");
 
             for (String url : urls) {
-                // Clear previous observations for each URL
-                observations.clear();
-                // Fetch and process data from the current URL
-                fetchDataAndParse(url);
-                final String result = formatObservations();
+                // Create a new list for the current URL's observations
+                CopyOnWriteArrayList<Observations> currentObservations = new CopyOnWriteArrayList<>();
 
-                // Get the corresponding TextView for each URL
-                TextView textView = getCorrespondingTextView(url);
-                if (textView != null) {
-                    final TextView finalTextView = textView;
-                    // Update the UI with the formatted data for this URL
-                    if (textView != null) {
-                        Log.d("MyTag", "Updating TextView with data");
-                        runOnUiThread(() -> textView.setText(result));
-                    } else {
-                        Log.d("MyTag", "TextView reference is null");
-                    }
+                // Fetch and process data into the current list
+                fetchDataAndParse(url, currentObservations);
 
-                }
+                // Store the list in the map, keyed by URL
+                observationsMap.put(url, currentObservations);
+
+                // Use the current list to update the UI
+                runOnUiThread(() -> updateLocationViews(currentObservations, url));
             }
         }
 
-        private void fetchDataAndParse(String urlString) {
+        private void fetchDataAndParse(String urlString, CopyOnWriteArrayList<Observations> currentObservations) {
             try {
                 URL url = new URL(urlString);
                 URLConnection yc = url.openConnection();
                 try (InputStream in = yc.getInputStream()) {
-                    parseDataO(in); // Parse the input stream
+                    parseDataO(in, currentObservations); // Parse the input stream
                 }
             } catch (IOException e) {
                 Log.e("MyTag", "IOException in fetchDataAndParse", e);
             }
         }
 
-        // Convert the list of Observations to a String format for display
-        private String formatObservations() {
-            StringBuilder formatted = new StringBuilder();
-            for (Observations observation : observations) {
-                formatted.append("Day: ").append(observation.getDay()).append("\n")
-                        .append("Temperature: ").append(observation.getTemperature()).append("\n")
-                        .append("Pressure: ").append(observation.getPressure()).append("\n")
-                        .append("Wind speed: ").append(observation.getWindSpeed()).append("\n\n");
+
+        private void updateLocationViews(CopyOnWriteArrayList<Observations> observations, String url) {
+            // As each URL corresponds to a single observation
+            if (!observations.isEmpty()) {
+                Observations observation = observations.get(0);
+
+                // assigning parsed elements to text views in locations
+                if (url.equals(observationUrls[0])) { // Glasgow's URL
+                    updateViewsForLocation(observation, glasgowDay, glasgowTemperature, glasgowPressure, glasgowWind);
+                    Log.d("LocationData", "Updating UI for Glasgow");
+                } else if (url.equals(observationUrls[1])) { // London's URL
+                    updateViewsForLocation(observation, londonDay, londonTemperature, londonPressure, londonWind);
+                    Log.d("LocationData", "Updating UI for London");
+                } else if (url.equals(observationUrls[2])) { // NewYork's URL
+                    updateViewsForLocation(observation, newYorkDay, newYorkTemperature, newYorkPressure, newYorkWind);
+                    Log.d("LocationData", "Updating UI for NY");
+                }else if (url.equals(observationUrls[3])) { // Oman's URL
+                    updateViewsForLocation(observation, omanDay, omanTemperature, omanPressure, omanWind);
+                    Log.d("LocationData", "Updating UI for Oman");
+                }else if (url.equals(observationUrls[4])) { // Mauritius's URL
+                    updateViewsForLocation(observation, mauritiusDay, mauritiusTemperature, mauritiusPressure, mauritiusWind);
+                    Log.d("LocationData", "Updating UI for Mauritius");
+                }else if (url.equals(observationUrls[5])) { // Bangladesh's URL
+                    updateViewsForLocation(observation, bangladeshDay, bangladeshTemperature, bangladeshPressure, bangladeshWind);
+                    Log.d("LocationData", "Updating UI for Bangladesh");
+                }
             }
-            return formatted.toString();
         }
-        private TextView getCorrespondingTextView(String url) {
-            // Implement logic to return the corresponding TextView based on the URL
-            if (url.equals(observationUrls[0])) {
-                return glasgowObs;
-            } else if (url.equals(observationUrls[1])) {
-                return londonObs;
-            } else if (url.equals(observationUrls[2])) {
-                return newyorkObs;
-            } else if (url.equals(observationUrls[3])) {
-                return omanObs;
-            } else if (url.equals(observationUrls[4])) {
-                return mauritiusObs;
-            } else if (url.equals(observationUrls[5])) {
-                return bangladeshObs;
-            }
-            return null;
+
+        private void updateViewsForLocation(Observations observation, TextView dayView, TextView temperatureView, TextView pressureView, TextView windView) {
+            dayView.setText(String.format("%s", observation.getDay()));
+            temperatureView.setText(String.format("%s", observation.getTemperature()));
+            pressureView.setText(String.format("%s", observation.getPressure()));
+            windView.setText(String.format("%s", observation.getWindSpeed()));
         }
     }
 
@@ -454,27 +539,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
 
-    private void parseDataO(InputStream in) {
+    private void parseDataO(InputStream in, CopyOnWriteArrayList<Observations> currentObservations) {
         try {
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
             factory.setNamespaceAware(true);
             XmlPullParser xpp = factory.newPullParser();
             xpp.setInput(in, null);
             int eventType = xpp.getEventType();
-            Observations currentObservations = null;
+            Observations newObservations = null;
 
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 if (eventType == XmlPullParser.START_TAG) {
                     String localName = xpp.getName();
 
                     if ("item".equalsIgnoreCase(localName)) {
-                        currentObservations = new Observations();
-                    } else if (currentObservations != null) {
+                        newObservations = new Observations(); // Create new observation instance
+                    } else if (newObservations != null) {
                         if ("title".equalsIgnoreCase(localName)) {
                             String titleText = xpp.nextText();
                             // Extract day, assuming it's the first word before the '-'
                             String day = titleText.split(" -")[0];
-                            currentObservations.setDay(day);
+                            newObservations.setDay(day);
                             Log.d("MyTag", "New item found!");
                         } else if ("description".equalsIgnoreCase(localName)) {
                             String descText = xpp.nextText();
@@ -483,7 +568,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             Matcher temperatureMatcher = temperaturePattern.matcher(descText);
                             if (temperatureMatcher.find()) {
                                 String temperatureWithUnit = temperatureMatcher.group(1) + "°C"; // Normalize the temperature string
-                                currentObservations.setTemperature(temperatureWithUnit);
+                                newObservations.setTemperature(temperatureWithUnit);
                                 Log.d("MyTag", "New item found!");
                             }
 
@@ -491,22 +576,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             Pattern pressurePattern = Pattern.compile("Pressure: (\\d+mb)");
                             Matcher pressureMatcher = pressurePattern.matcher(descText);
                             if (pressureMatcher.find()) {
-                                currentObservations.setPressure(pressureMatcher.group(1));
+                                newObservations.setPressure(pressureMatcher.group(1));
                                 Log.d("MyTag", "New item found!");
                             }
 
                             Pattern windSpeedPattern = Pattern.compile("Wind Speed: (\\d+mph)");
                             Matcher windSpeedMatcher = windSpeedPattern.matcher(descText);
                             if (windSpeedMatcher.find()) {
-                                currentObservations.setWindSpeed(windSpeedMatcher.group(1));
+                                newObservations.setWindSpeed(windSpeedMatcher.group(1));
                                 Log.d("MyTag", "New item found!");
                             }
                         }
                     }
                 } else if (eventType == XmlPullParser.END_TAG) {
                     if ("item".equalsIgnoreCase(xpp.getName()) && currentObservations != null) {
-                        observations.add(currentObservations);
-                        currentObservations = null;
+                        currentObservations.add(newObservations);
+                        newObservations = null;
                     }
                 }
                 eventType = xpp.next();
@@ -522,7 +607,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onResume() {
         super.onResume();
         if (googleMap != null) {
-            updateMapMarker(weatherViewFlipper1.getDisplayedChild());
+            updateMapLocation(weatherViewFlipper1.getDisplayedChild());
         }
     }
 

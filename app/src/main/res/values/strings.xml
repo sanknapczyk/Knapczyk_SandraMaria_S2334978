@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">Knapczyk_SandraMaria_S2334978</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string-array name="locations_array">
+        <item>Glasgow</item>
+        <item>London</item>
+        <item>New York</item>
+        <item>Oman</item>
+        <item>Mauritius</item>
+        <item>Bangladesh</item>
+    </string-array>
 </resources>

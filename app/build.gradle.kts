@@ -20,7 +20,7 @@ android {
 
     defaultConfig {
         applicationId = "com.gcu.knapczyk_sandramaria_s2334978"
-        minSdk = 24
+        minSdk = 21
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
