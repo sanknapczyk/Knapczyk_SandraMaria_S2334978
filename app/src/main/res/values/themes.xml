@@ -1,7 +1,10 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.Knapczyk_SandraMaria_S2334978" parent="Theme.Material3.DayNight.NoActionBar">
-
+        <item name="android:textViewStyle">@style/CustomTextViewStyle</item>
+    </style>
+    <style name="CustomTextViewStyle" parent="Widget.AppCompat.TextView">
+        <item name="android:textColor">@color/White</item>
     </style>
 
     <style name="Theme.Knapczyk_SandraMaria_S2334978" parent="Base.Theme.Knapczyk_SandraMaria_S2334978" />

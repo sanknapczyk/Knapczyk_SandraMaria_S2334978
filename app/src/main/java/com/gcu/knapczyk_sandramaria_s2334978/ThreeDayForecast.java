@@ -4,6 +4,9 @@ public class ThreeDayForecast {
     private String title;
     private String description;
     private String date;
+    private String day;
+    private String weatherCondition;
+    private String maximumTemperature;
     private String minimumTemperature;
     private String windDirection;
     private String windSpeed;
@@ -26,6 +29,21 @@ public class ThreeDayForecast {
     public void setTitle(String title) {
         this.title = title;
     }
+    public String getDay() {
+        return day;
+    }
+
+    public void setDay(String day) {
+        this.day = day;
+    }
+
+    public String getWeatherCondition() {
+        return weatherCondition;
+    }
+
+    public void setWeatherCondition(String weatherCondition) {
+        this.weatherCondition = weatherCondition;
+    }
 
     public String getDescription() {
         return description;
@@ -41,6 +59,13 @@ public class ThreeDayForecast {
 
     public void setDate(String date) {
         this.date = date;
+    }
+    public void setMaximumTemperature(String maximumTemperature) {
+        this.maximumTemperature = maximumTemperature;
+    }
+
+    public String getMaximumTemperature() {
+        return maximumTemperature;
     }
 
     public String getMinimumTemperature() {
@@ -119,18 +144,26 @@ public class ThreeDayForecast {
     @Override
     public String toString() {
         return "ThreeDayForecast{" +
-                "title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", date='" + date + '\'' +
-                ", minimumTemperature='" + minimumTemperature + '\'' +
-                ", windDirection='" + windDirection + '\'' +
-                ", windSpeed='" + windSpeed + '\'' +
-                ", visibility='" + visibility + '\'' +
-                ", pressure='" + pressure + '\'' +
-                ", humidity='" + humidity + '\'' +
-                ", uvRisk='" + uvRisk + '\'' +
-                ", pollution='" + pollution + '\'' +
-                ", sunset='" + sunset + '\'' +
+                "title='" + safeString(title) + '\'' +
+                ", day='" + safeString(day) + '\'' +
+                ", weatherCondition='" + safeString(weatherCondition) + '\'' +
+                ", description='" + safeString(description) + '\'' +
+                ", date='" + safeString(date) + '\'' +
+                ", maxTemp='" + safeString(maximumTemperature) + '\'' +
+                ", minTemp='" + safeString(minimumTemperature) + '\'' +
+                ", windDirection='" + safeString(windDirection) + '\'' +
+                ", windSpeed='" + safeString(windSpeed) + '\'' +
+                ", visibility='" + safeString(visibility) + '\'' +
+                ", pressure='" + safeString(pressure) + '\'' +
+                ", humidity='" + safeString(humidity) + '\'' +
+                ", uvRisk='" + safeString(uvRisk) + '\'' +
+                ", pollution='" + safeString(pollution) + '\'' +
+                ", sunset='" + safeString(sunset) + '\'' +
                 '}';
     }
+
+    private String safeString(String input) {
+        return input != null ? input : "N/A";
+    }
+
 }

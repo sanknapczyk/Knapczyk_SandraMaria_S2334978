@@ -1,17 +1,25 @@
 package com.gcu.knapczyk_sandramaria_s2334978;
 
+import static java.lang.System.in;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.Pair;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ScrollView;
@@ -30,7 +38,10 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -43,36 +54,57 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.LinkedList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback {
     private GoogleMap googleMap;
     private ScrollView scrollView;
     private ViewSwitcher viewSwitcher;
+    private FragmentContainerView fragmentContainerView;
     private ViewFlipper weatherViewFlipper1, weatherViewFlipper2;
     private Button backButton, forButton;
     private ImageButton nextButton1, prevButton1, nextButton2, prevButton2;
+    private ImageButton infoGlasgow1, infoGlasgow2, infoGlasgow3, infoLondon1, infoLondon2, infoLondon3, infoNewYork1, infoNewYork2, infoNewYork3, infoOman1, infoOman2, infoOman3, infoMauritius1, infoMauritius2, infoMauritius3, infoBangladesh1, infoBangladesh2, infoBangladesh3;
     private Spinner locationSpinner;
-    private TextView glasgowFor, londonFor, newyorkFor, omanFor, mauritiusFor, bangladeshFor;
-    // Glasgow
+    // Glasgow 3-day forecast text views
+    private TextView glasgowDay1, glasgowMax1, glasgowMin1, glasgowDay2, glasgowMax2, glasgowMin2, glasgowDay3, glasgowMax3, glasgowMin3;
+
+    // London 3-day forecast text views
+    private TextView londonDay1, londonMax1, londonMin1, londonDay2, londonMax2, londonMin2, londonDay3, londonMax3, londonMin3;
+
+    // New York 3-day forecast text views
+    private TextView newYorkDay1, newYorkMax1, newYorkMin1, newYorkDay2, newYorkMax2, newYorkMin2, newYorkDay3, newYorkMax3, newYorkMin3;
+
+    // Oman 3-day forecast text views
+    private TextView omanDay1, omanMax1, omanMin1, omanDay2, omanMax2, omanMin2, omanDay3, omanMax3, omanMin3;
+
+    // Mauritius 3-day forecast text views
+    private TextView mauritiusDay1, mauritiusMax1, mauritiusMin1, mauritiusDay2, mauritiusMax2, mauritiusMin2, mauritiusDay3, mauritiusMax3, mauritiusMin3;
+
+    // Bangladesh 3-day forecast text views
+    private TextView bangladeshDay1, bangladeshMax1, bangladeshMin1, bangladeshDay2, bangladeshMax2, bangladeshMin2, bangladeshDay3, bangladeshMax3, bangladeshMin3;
+
+    // Glasgow observation textviews
     private TextView glasgowDay, glasgowTemperature, glasgowPressure, glasgowWind;
 
-    // London
+    // London observation textviews
     private TextView londonDay, londonTemperature, londonPressure, londonWind;
 
-    // New York
+    // New York observation textviews
     private TextView newYorkDay, newYorkTemperature, newYorkPressure, newYorkWind;
 
-    // Oman
+    // Oman observation textviews
     private TextView omanDay, omanTemperature, omanPressure, omanWind;
 
-    // Mauritius
+    // Mauritius observation textviews
     private TextView mauritiusDay, mauritiusTemperature, mauritiusPressure, mauritiusWind;
 
-    // Bangladesh
+    // Bangladesh observation textviews
     private TextView bangladeshDay, bangladeshTemperature, bangladeshPressure, bangladeshWind;
+
+    // Image views for forecast
+    private ImageView glasgowIcon1, glasgowIcon2, glasgowIcon3, londonIcon1, londonIcon2, londonIcon3, newYorkIcon1, newYorkIcon2, newYorkIcon3, omanIcon1, omanIcon2, omanIcon3, mauritiusIcon1, mauritiusIcon2, mauritiusIcon3, bangladeshIcon1, bangladeshIcon2, bangladeshIcon3;
 
 
     private final LatLng[] CITY_COORDINATES = new LatLng[]{
@@ -102,13 +134,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             "https://weather-broker-cdn.api.bbci.co.uk/en/forecast/rss/3day/1185241"
     };
 
-    CopyOnWriteArrayList<ThreeDayForecast> forecasts = new CopyOnWriteArrayList<>();
+    private Map<String, CopyOnWriteArrayList<ThreeDayForecast>> forecastMap = new ConcurrentHashMap<>();
     private Map<String, CopyOnWriteArrayList<Observations>> observationsMap = new ConcurrentHashMap<>();
+    private Map<Integer, Pair<String, Integer>> buttonToForecastInfo;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTheme(R.style.Base_Theme_Knapczyk_SandraMaria_S2334978);
         setContentView(R.layout.activity_main);
 
         // Initialize TextViews for 6 locations
@@ -142,12 +176,161 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bangladeshPressure = findViewById(R.id.bangladeshPressure);
         bangladeshWind = findViewById(R.id.bangladeshWind);
 
-        glasgowFor = (TextView) findViewById(R.id.glasgowFor);
-        londonFor = (TextView) findViewById(R.id.londonFor);
-        newyorkFor = (TextView) findViewById(R.id.newyorkFor);
-        omanFor = (TextView) findViewById(R.id.omanFor);
-        mauritiusFor = (TextView) findViewById(R.id.mauritiusFor);
-        bangladeshFor = (TextView) findViewById(R.id.bangladeshFor);
+        // Set text views for 3day forecast
+        // Initialize Glasgow TextViews
+        glasgowDay1 = findViewById(R.id.glasgowDay1);
+        glasgowMax1 = findViewById(R.id.glasgowMax1);
+        glasgowMin1 = findViewById(R.id.glasgowMin1);
+        glasgowDay2 = findViewById(R.id.glasgowDay2);
+        glasgowMax2 = findViewById(R.id.glasgowMax2);
+        glasgowMin2 = findViewById(R.id.glasgowMin2);
+        glasgowDay3 = findViewById(R.id.glasgowDay3);
+        glasgowMax3 = findViewById(R.id.glasgowMax3);
+        glasgowMin3 = findViewById(R.id.glasgowMin3);
+
+        // Initialize London TextViews
+        londonDay1 = findViewById(R.id.londonDay1);
+        londonMax1 = findViewById(R.id.londonMax1);
+        londonMin1 = findViewById(R.id.londonMin1);
+        londonDay2 = findViewById(R.id.londonDay2);
+        londonMax2 = findViewById(R.id.londonMax2);
+        londonMin2 = findViewById(R.id.londonMin2);
+        londonDay3 = findViewById(R.id.londonDay3);
+        londonMax3 = findViewById(R.id.londonMax3);
+        londonMin3 = findViewById(R.id.londonMin3);
+
+        // Initialize New York TextViews
+        newYorkDay1 = findViewById(R.id.newYorkDay1);
+        newYorkMax1 = findViewById(R.id.newYorkMax1);
+        newYorkMin1 = findViewById(R.id.newYorkMin1);
+        newYorkDay2 = findViewById(R.id.newYorkDay2);
+        newYorkMax2 = findViewById(R.id.newYorkMax2);
+        newYorkMin2 = findViewById(R.id.newYorkMin2);
+        newYorkDay3 = findViewById(R.id.newYorkDay3);
+        newYorkMax3 = findViewById(R.id.newYorkMax3);
+        newYorkMin3 = findViewById(R.id.newYorkMin3);
+
+        // Initialize Oman TextViews
+        omanDay1 = findViewById(R.id.omanDay1);
+        omanMax1 = findViewById(R.id.omanMax1);
+        omanMin1 = findViewById(R.id.omanMin1);
+        omanDay2 = findViewById(R.id.omanDay2);
+        omanMax2 = findViewById(R.id.omanMax2);
+        omanMin2 = findViewById(R.id.omanMin2);
+        omanDay3 = findViewById(R.id.omanDay3);
+        omanMax3 = findViewById(R.id.omanMax3);
+        omanMin3 = findViewById(R.id.omanMin3);
+
+        // Initialize Mauritius TextViews
+        mauritiusDay1 = findViewById(R.id.mauritiusDay1);
+        mauritiusMax1 = findViewById(R.id.mauritiusMax1);
+        mauritiusMin1 = findViewById(R.id.mauritiusMin1);
+        mauritiusDay2 = findViewById(R.id.mauritiusDay2);
+        mauritiusMax2 = findViewById(R.id.mauritiusMax2);
+        mauritiusMin2 = findViewById(R.id.mauritiusMin2);
+        mauritiusDay3 = findViewById(R.id.mauritiusDay3);
+        mauritiusMax3 = findViewById(R.id.mauritiusMax3);
+        mauritiusMin3 = findViewById(R.id.mauritiusMin3);
+
+        // Initialize Bangladesh TextViews
+        bangladeshDay1 = findViewById(R.id.bangladeshDay1);
+        bangladeshMax1 = findViewById(R.id.bangladeshMax1);
+        bangladeshMin1 = findViewById(R.id.bangladeshMin1);
+        bangladeshDay2 = findViewById(R.id.bangladeshDay2);
+        bangladeshMax2 = findViewById(R.id.bangladeshMax2);
+        bangladeshMin2 = findViewById(R.id.bangladeshMin2);
+        bangladeshDay3 = findViewById(R.id.bangladeshDay3);
+        bangladeshMax3 = findViewById(R.id.bangladeshMax3);
+        bangladeshMin3 = findViewById(R.id.bangladeshMin3);
+
+        // Initialise image views for the weather icons
+        glasgowIcon1 = findViewById(R.id.glasgowIcon1);
+        glasgowIcon2 = findViewById(R.id.glasgowIcon2);
+        glasgowIcon3 = findViewById(R.id.glasgowIcon3);
+        londonIcon1 = findViewById(R.id.londonIcon1);
+        londonIcon2 = findViewById(R.id.londonIcon2);
+        londonIcon3 = findViewById(R.id.londonIcon3);
+        newYorkIcon1 = findViewById(R.id.newYorkIcon1);
+        newYorkIcon2 = findViewById(R.id.newYorkIcon2);
+        newYorkIcon3 = findViewById(R.id.newYorkIcon3);
+        omanIcon1 = findViewById(R.id.omanIcon1);
+        omanIcon2 = findViewById(R.id.omanIcon2);
+        omanIcon3 = findViewById(R.id.omanIcon3);
+        mauritiusIcon1 = findViewById(R.id.mauritiusIcon1);
+        mauritiusIcon2 = findViewById(R.id.mauritiusIcon2);
+        mauritiusIcon3 = findViewById(R.id.mauritiusIcon3);
+        bangladeshIcon1 = findViewById(R.id.bangladeshIcon1);
+        bangladeshIcon2 = findViewById(R.id.bangladeshIcon2);
+        bangladeshIcon3 = findViewById(R.id.bangladeshIcon3);
+
+        // Initialize Glasgow ImageButtons
+        infoGlasgow1 = findViewById(R.id.infoGlasgow1);
+        infoGlasgow1.setOnClickListener(this);
+        infoGlasgow2 = findViewById(R.id.infoGlasgow2);
+        infoGlasgow2.setOnClickListener(this);
+        infoGlasgow3 = findViewById(R.id.infoGlasgow3);
+        infoGlasgow3.setOnClickListener(this);
+
+        // Initialize London ImageButtons
+        infoLondon1 = findViewById(R.id.infoLondon1);
+        infoLondon1.setOnClickListener(this);
+        infoLondon2 = findViewById(R.id.infoLondon2);
+        infoLondon2.setOnClickListener(this);
+        infoLondon3 = findViewById(R.id.infoLondon3);
+        infoLondon3.setOnClickListener(this);
+
+        // Initialize New York ImageButtons
+        infoNewYork1 = findViewById(R.id.infoNewYork1);
+        infoNewYork1.setOnClickListener(this);
+        infoNewYork2 = findViewById(R.id.infoNewYork2);
+        infoNewYork2.setOnClickListener(this);
+        infoNewYork3 = findViewById(R.id.infoNewYork3);
+        infoNewYork3.setOnClickListener(this);
+
+        // Initialize Oman ImageButtons
+        infoOman1 = findViewById(R.id.infoOman1);
+        infoOman1.setOnClickListener(this);
+        infoOman2 = findViewById(R.id.infoOman2);
+        infoOman2.setOnClickListener(this);
+        infoOman3 = findViewById(R.id.infoOman3);
+        infoOman3.setOnClickListener(this);
+
+        // Initialize Mauritius ImageButtons
+        infoMauritius1 = findViewById(R.id.infoMauritius1);
+        infoMauritius1.setOnClickListener(this);
+        infoMauritius2 = findViewById(R.id.infoMauritius2);
+        infoMauritius2.setOnClickListener(this);
+        infoMauritius3 = findViewById(R.id.infoMauritius3);
+        infoMauritius3.setOnClickListener(this);
+
+        // Initialize Bangladesh ImageButtons
+        infoBangladesh1 = findViewById(R.id.infoBangladesh1);
+        infoBangladesh1.setOnClickListener(this);
+        infoBangladesh2 = findViewById(R.id.infoBangladesh2);
+        infoBangladesh2.setOnClickListener(this);
+        infoBangladesh3 = findViewById(R.id.infoBangladesh3);
+        infoBangladesh3.setOnClickListener(this);
+
+        // Map image buttons for additional info
+        buttonToForecastInfo.put(R.id.infoGlasgow1, new Pair<>("Glasgow", 0));
+        buttonToForecastInfo.put(R.id.infoGlasgow2, new Pair<>("Glasgow", 1));
+        buttonToForecastInfo.put(R.id.infoGlasgow3, new Pair<>("Glasgow", 2));
+        buttonToForecastInfo.put(R.id.infoLondon1, new Pair<>("London", 0));
+        buttonToForecastInfo.put(R.id.infoLondon2, new Pair<>("London", 1));
+        buttonToForecastInfo.put(R.id.infoLondon3, new Pair<>("London", 2));
+        buttonToForecastInfo.put(R.id.infoNewYork1, new Pair<>("New York", 0));
+        buttonToForecastInfo.put(R.id.infoNewYork2, new Pair<>("New York", 1));
+        buttonToForecastInfo.put(R.id.infoNewYork3, new Pair<>("New York", 2));
+        buttonToForecastInfo.put(R.id.infoOman1, new Pair<>("Oman", 0));
+        buttonToForecastInfo.put(R.id.infoOman2, new Pair<>("Oman", 1));
+        buttonToForecastInfo.put(R.id.infoOman3, new Pair<>("Oman", 2));
+        buttonToForecastInfo.put(R.id.infoMauritius1, new Pair<>("Mauritius", 0));
+        buttonToForecastInfo.put(R.id.infoMauritius2, new Pair<>("Mauritius", 1));
+        buttonToForecastInfo.put(R.id.infoMauritius3, new Pair<>("Mauritius", 2));
+        buttonToForecastInfo.put(R.id.infoBangladesh1, new Pair<>("Bangladesh", 0));
+        buttonToForecastInfo.put(R.id.infoBangladesh2, new Pair<>("Bangladesh", 1));
+        buttonToForecastInfo.put(R.id.infoBangladesh3, new Pair<>("Bangladesh", 2));
+
 
         // Set up link to layout views
         scrollView = (ScrollView) findViewById(R.id.scrollView);
@@ -157,6 +340,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     Toast.LENGTH_LONG);
             Log.e(getPackageName(), "null pointer");
         }
+
 
         // Initialise ViewFlippers
         weatherViewFlipper1 = findViewById(R.id.weatherViewFlipper1);
@@ -190,7 +374,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-
         // Set up link to buttons
         forButton = findViewById(R.id.forButton);
         nextButton1 = findViewById(R.id.buttonNext1);
@@ -204,7 +387,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         nextButton2.setOnClickListener(this);
         prevButton2.setOnClickListener(this);
         backButton.setOnClickListener(this);
-        startProgressObservations();
+
+        //startProgressObservations();
+        startProgressForecasts();
+
+        //Initialise maps fragment
+        fragmentContainerView = findViewById(R.id.map);
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -213,7 +401,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             mapFragment.getMapAsync(this); // to the OnMapReadyCallback
         }
     }
-
 
 
     @Override
@@ -247,7 +434,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-        // Start the task with both URLs
+
+
+    // Start the task with both URLs
     public void startProgressObservations() {
         Log.d("MyTag", "Starting observations progress");
         new Thread(new Task2(observationUrls)).start();
@@ -256,7 +445,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void startProgressForecasts() {
         Log.d("MyTag", "Starting forecasts progress");
-            new Thread(new Task(forecastUrls)).start();
+        new Thread(new Task(forecastUrls)).start();
 
     }
 
@@ -333,13 +522,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 } else if (url.equals(observationUrls[2])) { // NewYork's URL
                     updateViewsForLocation(observation, newYorkDay, newYorkTemperature, newYorkPressure, newYorkWind);
                     Log.d("LocationData", "Updating UI for NY");
-                }else if (url.equals(observationUrls[3])) { // Oman's URL
+                } else if (url.equals(observationUrls[3])) { // Oman's URL
                     updateViewsForLocation(observation, omanDay, omanTemperature, omanPressure, omanWind);
                     Log.d("LocationData", "Updating UI for Oman");
-                }else if (url.equals(observationUrls[4])) { // Mauritius's URL
+                } else if (url.equals(observationUrls[4])) { // Mauritius's URL
                     updateViewsForLocation(observation, mauritiusDay, mauritiusTemperature, mauritiusPressure, mauritiusWind);
                     Log.d("LocationData", "Updating UI for Mauritius");
-                }else if (url.equals(observationUrls[5])) { // Bangladesh's URL
+                } else if (url.equals(observationUrls[5])) { // Bangladesh's URL
                     updateViewsForLocation(observation, bangladeshDay, bangladeshTemperature, bangladeshPressure, bangladeshWind);
                     Log.d("LocationData", "Updating UI for Bangladesh");
                 }
@@ -353,191 +542,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             windView.setText(String.format("%s", observation.getWindSpeed()));
         }
     }
-
-    private class Task implements Runnable {
-        private String[] urls;
-
-        public Task(String[] urls) {
-            this.urls = urls;
-        }
-
-        @Override
-        public void run() {
-            Log.d("MyTag", "Task started");
-
-
-            for (String url1 : urls) {
-                // Clear previous forecasts for each URL
-                forecasts.clear();
-                // Fetch and process data from the current URL
-                fetchDataAndParse(url1);
-                final String result1 = formatForecasts();
-
-                // Get the corresponding TextView for each URL
-                TextView textView1 = getCorrespondingTextView(url1);
-                if (textView1 != null) {
-                    final TextView finalTextView = textView1;
-                    // Update the UI with the formatted data for this URL
-                    if (textView1 != null) {
-                        Log.d("MyTag", "Updating TextView with data - forecasts");
-                        runOnUiThread(() -> textView1.setText(result1));
-                    } else {
-                        Log.d("MyTag", "TextView reference is null");
-                    }
-
-                }
-            }
-        }
-
-        private void fetchDataAndParse(String urlString) {
-            try {
-                URL url1 = new URL(urlString);
-                URLConnection yc = url1.openConnection();
-                try (InputStream in = yc.getInputStream()) {
-                    parseDataF(in); // Parse the input stream
-                }
-            } catch (IOException e) {
-                Log.e("MyTag", "IOException in fetchDataAndParse", e);
-            }
-        }
-
-        // Convert the list of Forecasts to a String format for display
-        private String formatForecasts() {
-            StringBuilder formattedf = new StringBuilder();
-            for (ThreeDayForecast threeDayForecast : forecasts) {
-                formattedf.append("Day: ").append(threeDayForecast.getTitle()).append("\n")
-                        .append("Description: ").append(threeDayForecast.getDescription()).append("\n")
-                        .append("Date: ").append(threeDayForecast.getDate()).append("\n\n");
-            }
-            return formattedf.toString();
-        }
-
-        private TextView getCorrespondingTextView(String url1) {
-            // Implement logic to return the corresponding TextView based on the URL
-            if (url1.equals(forecastUrls[0])) {
-                return glasgowFor;
-            } else if (url1.equals(forecastUrls[1])) {
-                return londonFor;
-            } else if (url1.equals(forecastUrls[2])) {
-                return newyorkFor;
-            } else if (url1.equals(forecastUrls[3])) {
-                return omanFor;
-            } else if (url1.equals(forecastUrls[4])) {
-                return mauritiusFor;
-            } else if (url1.equals(forecastUrls[5])) {
-                return bangladeshFor;
-            }
-            return null;
-        }
-    }
-
-
-
-
-    private void parseDataF(InputStream in) {
-        try {
-            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-            factory.setNamespaceAware(true);
-            XmlPullParser xpp = factory.newPullParser();
-            xpp.setInput(in, null);
-            int eventType = xpp.getEventType();
-            ThreeDayForecast currentForecast = null;
-
-            while (eventType != XmlPullParser.END_DOCUMENT) {
-                if (eventType == XmlPullParser.START_TAG) {
-                    if (xpp.getName().equalsIgnoreCase("item")) {
-                        currentForecast = new ThreeDayForecast();
-                    } else if (currentForecast != null) {
-                        if (xpp.getName().equalsIgnoreCase("title")) {
-                            currentForecast.setTitle(xpp.nextText());
-                        } else if (xpp.getName().equalsIgnoreCase("description")) {
-                            String description = xpp.nextText();
-                            currentForecast.setDescription(description);
-
-                            // Parse the description for various pieces of information
-                            parseDescription(description, currentForecast);
-                        } else if (xpp.getName().equalsIgnoreCase("pubDate")) {
-                            currentForecast.setDate(xpp.nextText());
-                        }
-                    }
-                } else if (eventType == XmlPullParser.END_TAG && xpp.getName().equalsIgnoreCase("item") && currentForecast != null) {
-                    forecasts.add(currentForecast);
-                    currentForecast = null;
-                }
-                eventType = xpp.next();
-            }
-        } catch (XmlPullParserException | IOException e) {
-            Log.e("MyTag", "Error during parsing", e);
-        }
-        Log.d("MyTag", "End of document reached. Forecasts size: " + forecasts.size());
-    }
-
-    private void parseDescription(String description, ThreeDayForecast forecast) {
-        // Temperature
-        Pattern tempPattern = Pattern.compile("Minimum Temperature: (\\d+Â°C)");
-        Matcher tempMatcher = tempPattern.matcher(description);
-        if (tempMatcher.find()) {
-            forecast.setMinimumTemperature(tempMatcher.group(1));
-        }
-
-        // Wind Direction
-        Pattern windDirPattern = Pattern.compile("Wind Direction: ([a-zA-Z]+)");
-        Matcher windDirMatcher = windDirPattern.matcher(description);
-        if (windDirMatcher.find()) {
-            forecast.setWindDirection(windDirMatcher.group(1));
-        }
-
-        // Wind Speed
-        Pattern windSpeedPattern = Pattern.compile("Wind Speed: (\\d+mph)");
-        Matcher windSpeedMatcher = windSpeedPattern.matcher(description);
-        if (windSpeedMatcher.find()) {
-            forecast.setWindSpeed(windSpeedMatcher.group(1));
-        }
-
-        // Visibility
-        Pattern visibilityPattern = Pattern.compile("Visibility: (\\w+)");
-        Matcher visibilityMatcher = visibilityPattern.matcher(description);
-        if (visibilityMatcher.find()) {
-            forecast.setVisibility(visibilityMatcher.group(1));
-        }
-
-        // Pressure
-        Pattern pressurePattern = Pattern.compile("Pressure: (\\d+mb)");
-        Matcher pressureMatcher = pressurePattern.matcher(description);
-        if (pressureMatcher.find()) {
-            forecast.setPressure(pressureMatcher.group(1));
-        }
-
-        // Humidity
-        Pattern humidityPattern = Pattern.compile("Humidity: (\\d+)%");
-        Matcher humidityMatcher = humidityPattern.matcher(description);
-        if (humidityMatcher.find()) {
-            forecast.setHumidity(humidityMatcher.group(1) + "%");
-        }
-
-        // UV Risk
-        Pattern uvRiskPattern = Pattern.compile("UV Risk: (\\d+)");
-        Matcher uvRiskMatcher = uvRiskPattern.matcher(description);
-        if (uvRiskMatcher.find()) {
-            forecast.setUvRisk(uvRiskMatcher.group(1));
-        }
-
-        // Pollution
-        Pattern pollutionPattern = Pattern.compile("Pollution: (\\w+)");
-        Matcher pollutionMatcher = pollutionPattern.matcher(description);
-        if (pollutionMatcher.find()) {
-            forecast.setPollution(pollutionMatcher.group(1));
-        }
-
-        // Sunset
-        Pattern sunsetPattern = Pattern.compile("Sunset: (\\d{2}:\\d{2} GMT)");
-        Matcher sunsetMatcher = sunsetPattern.matcher(description);
-        if (sunsetMatcher.find()) {
-            forecast.setSunset(sunsetMatcher.group(1));
-        }
-    }
-
-
 
     private void parseDataO(InputStream in, CopyOnWriteArrayList<Observations> currentObservations) {
         try {
@@ -603,13 +607,289 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (googleMap != null) {
-            updateMapLocation(weatherViewFlipper1.getDisplayedChild());
+    private class Task implements Runnable {
+        private String[] urls;
+
+        public Task(String[] urls) {
+            this.urls = urls;
         }
+
+        @Override
+        public void run() {
+            Log.d("MyTag", "Forecast Task started");
+
+            for (String url : urls) {
+                CopyOnWriteArrayList<ThreeDayForecast> currentForecasts = new CopyOnWriteArrayList<>();
+                fetchDataAndParse(url, currentForecasts);
+
+                // Resolve URL to location name
+                String locationName = getLocationNameFromUrl(url);
+
+                // Ensure location name is valid
+                if (locationName != null) {
+                    // Update UI on the main thread
+                    runOnUiThread(() -> updateForecastViews(locationName, currentForecasts));
+                } else {
+                    Log.e("MyTag", "Failed to resolve location name from URL: " + url);
+                }
+            }
+        }
+
+        private void fetchDataAndParse(String urlString, CopyOnWriteArrayList<ThreeDayForecast> currentForecasts) {
+            try {
+                URL url = new URL(urlString);
+                URLConnection yc = url.openConnection();
+                try (InputStream in = yc.getInputStream()) {
+                    parseDataF(in, currentForecasts); // Parse the input stream
+                }
+            } catch (IOException e) {
+                Log.e("MyTag", "IOException in fetchDataAndParse", e);
+            }
+        }
+
+        private void updateForecastViews(String locationName, CopyOnWriteArrayList<ThreeDayForecast> forecasts) {
+            if (forecasts == null || forecasts.isEmpty()) {
+                Log.e("MyTag", "Forecast data is empty for " + locationName);
+                return;
+            }
+
+            switch (locationName) {
+                case "Glasgow":
+                    updateForecastTextViews(forecasts, glasgowDay1, glasgowMax1, glasgowMin1, glasgowIcon1, glasgowDay2, glasgowMax2, glasgowMin2, glasgowIcon2, glasgowDay3, glasgowMax3, glasgowMin3, glasgowIcon3);
+                    break;
+                case "London":
+                    updateForecastTextViews(forecasts, londonDay1, londonMax1, londonMin1, londonIcon1, londonDay2, londonMax2, londonMin2, londonIcon2, londonDay3, londonMax3, londonMin3, londonIcon3);
+                    break;
+                case "New York":
+                    updateForecastTextViews(forecasts, newYorkDay1, newYorkMax1, newYorkMin1, newYorkIcon1, newYorkDay2, newYorkMax2, newYorkMin2, newYorkIcon2, newYorkDay3, newYorkMax3, newYorkMin3, newYorkIcon3);
+                    break;
+                case "Oman":
+                    updateForecastTextViews(forecasts, omanDay1, omanMax1, omanMin1, omanIcon1, omanDay2, omanMax2, omanMin2, omanIcon2, omanDay3, omanMax3, omanMin3, omanIcon3);
+                    break;
+                case "Mauritius":
+                    updateForecastTextViews(forecasts, mauritiusDay1, mauritiusMax1, mauritiusMin1, mauritiusIcon1, mauritiusDay2, mauritiusMax2, mauritiusMin2, mauritiusIcon2, mauritiusDay3, mauritiusMax3, mauritiusMin3, mauritiusIcon3);
+                    break;
+                case "Bangladesh":
+                    updateForecastTextViews(forecasts, bangladeshDay1, bangladeshMax1, bangladeshMin1, bangladeshIcon1, bangladeshDay2, bangladeshMax2, bangladeshMin2, bangladeshIcon2, bangladeshDay3, bangladeshMax3, bangladeshMin3, bangladeshIcon3);
+                    break;
+                default:
+                    Log.e("MyTag", "Unknown location name: " + locationName);
+                    break;
+            }
+        }
+
+        private void updateForecastTextViews(CopyOnWriteArrayList<ThreeDayForecast> forecasts,
+                                             TextView day1, TextView max1, TextView min1, ImageView icon1,
+                                             TextView day2, TextView max2, TextView min2, ImageView icon2,
+                                             TextView day3, TextView max3, TextView min3, ImageView icon3) {
+            // Ensure we have at least three forecasts to update the UI correctly
+            if (forecasts.size() >= 3) {
+                ThreeDayForecast forecastDay1 = forecasts.get(0); // First day forecast
+                day1.setText(forecastDay1.getDay());
+                max1.setText(forecastDay1.getMaximumTemperature());
+                min1.setText(forecastDay1.getMinimumTemperature());
+                icon1.setImageResource(getIconResourceId(forecastDay1.getWeatherCondition()));
+
+                ThreeDayForecast forecastDay2 = forecasts.get(1); // Second day forecast
+                day2.setText(forecastDay2.getDay());
+                max2.setText(forecastDay2.getMaximumTemperature());
+                min2.setText(forecastDay2.getMinimumTemperature());
+                icon2.setImageResource(getIconResourceId(forecastDay2.getWeatherCondition()));
+
+                ThreeDayForecast forecastDay3 = forecasts.get(2); // Third day forecast
+                day3.setText(forecastDay3.getDay());
+                max3.setText(forecastDay3.getMaximumTemperature());
+                min3.setText(forecastDay3.getMinimumTemperature());
+                icon3.setImageResource(getIconResourceId(forecastDay3.getWeatherCondition()));
+            } else {
+                Log.e("MyTag", "Not enough forecast data to update all days.");
+            }
+        }
+
+        public void updateWeatherIcon(ImageView imageView, String weatherCondition) {
+            int resourceId = getIconResourceId(weatherCondition);
+            imageView.setImageResource(resourceId);
+        }
+
+        private int getIconResourceId(String weatherCondition) {
+            switch (weatherCondition) {
+                case "Sunny":
+                    return R.drawable.sunny;
+                case "Sunny Intervals":
+                    return R.drawable.sunny_intervals;
+                case "Light Cloud":
+                    return R.drawable.fully_cloudy;
+                case "Partly Cloudy":
+                    return R.drawable.cloudy;
+                case "Light Rain Showers":
+                    return R.drawable.rain;
+                case "Light Rain":
+                    return R.drawable.rain;
+                case "Drizzle":
+                    return R.drawable.light_rain;
+                case "Heavy Rain":
+                    return R.drawable.heavy_rain;
+                case "Thundery Showers":
+                    return R.drawable.thundery;
+                default:
+                    return R.drawable.cloudy; // Default icon
+            }
+        }
+
+    }
+
+    private String getLocationNameFromUrl(String url) {
+        if (url.equals(forecastUrls[0])) return "Glasgow";
+        if (url.equals(forecastUrls[1])) return "London";
+        if (url.equals(forecastUrls[2])) return "New York";
+        if (url.equals(forecastUrls[3])) return "Oman";
+        if (url.equals(forecastUrls[4])) return "Mauritius";
+        if (url.equals(forecastUrls[5])) return "Bangladesh";
+        return null;
     }
 
 
+    private void parseDataF(InputStream in, CopyOnWriteArrayList<ThreeDayForecast> currentForecasts) {
+        try {
+            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
+            factory.setNamespaceAware(true);
+            XmlPullParser xpp = factory.newPullParser();
+            xpp.setInput(in, null);
+            int eventType = xpp.getEventType();
+            ThreeDayForecast newForecast = null;
+
+            while (eventType != XmlPullParser.END_DOCUMENT) {
+                if (eventType == XmlPullParser.START_TAG) {
+                    if (xpp.getName().equalsIgnoreCase("item")) {
+                        newForecast = new ThreeDayForecast();
+                    } else if (newForecast != null) {
+                        if (xpp.getName().equalsIgnoreCase("title")) {
+                            String title = xpp.nextText();
+                            Log.d("MyTag", "Parsing title: " + title); // Logging the title for debugging
+
+                            // Extracting day and condition
+                            String[] parts = title.split(",", 2);
+                            if (parts.length > 0) {
+                                String[] titleParts = parts[0].split(":", 2);
+                                if (titleParts.length == 2) {
+                                    newForecast.setDay(titleParts[0].trim());
+                                    newForecast.setWeatherCondition(titleParts[1].trim());
+                                }
+                            }
+
+                            // Initializing default values
+                            String minTemp = "N/A";
+                            String maxTemp = "N/A";
+
+                            // Attempt to parse temperatures
+                            if (title.contains("Minimum Temperature")) {
+                                try {
+                                    String[] tempParts = title.split("Minimum Temperature:")[1].split("Â°C")[0].trim().split(" ");
+                                    minTemp = tempParts[0];
+                                } catch (Exception e) {
+                                    Log.e("MyTag", "Error parsing minimum temperature", e);
+                                }
+                            }
+
+                            if (title.contains("Maximum Temperature")) {
+                                try {
+                                    String[] tempParts = title.split("Maximum Temperature:")[1].split("Â°C")[0].trim().split(" ");
+                                    maxTemp = tempParts[0];
+                                } catch (Exception e) {
+                                    Log.e("MyTag", "Error parsing maximum temperature", e);
+                                }
+                            }
+
+                            // Setting the temperatures
+                            newForecast.setMinimumTemperature(minTemp);
+                            newForecast.setMaximumTemperature(maxTemp);
+                            Log.d("MyTag", "Parsed temperatures - Min: " + minTemp + ", Max: " + maxTemp);
+
+                        } else if (xpp.getName().equalsIgnoreCase("description")) {
+                            String description = xpp.nextText();
+                            newForecast.setDescription(description);
+                            // Parse the description for various pieces of information
+                            parseDescription(description, newForecast);
+                        } else if (xpp.getName().equalsIgnoreCase("pubDate")) {
+                            newForecast.setDate(xpp.nextText());
+                        }
+                    }
+                } else if (eventType == XmlPullParser.END_TAG && xpp.getName().equalsIgnoreCase("item") && newForecast != null) {
+                    currentForecasts.add(newForecast);
+                    newForecast = null;
+                }
+                eventType = xpp.next();
+            }
+        } catch (XmlPullParserException | IOException e) {
+            Log.e("MyTag", "Error during parsing", e);
+        }
+        Log.d("MyTag", "End of document reached. Forecasts size: " + currentForecasts.size());
+    }
+
+    private void parseDescription(String description, ThreeDayForecast forecast) {
+
+        // Wind Direction
+        Pattern windDirPattern = Pattern.compile("Wind Direction: (\\w+ \\w+)");
+        Matcher windDirMatcher = windDirPattern.matcher(description);
+        if (windDirMatcher.find()) {
+            forecast.setWindDirection(windDirMatcher.group(1));
+            Log.d("WeatherParse", "Parsed Wind Direction: " + windDirMatcher.group(1));
+        }
+
+        // Wind Speed
+        Pattern windSpeedPattern = Pattern.compile("Wind Speed: (\\d+)mph");
+        Matcher windSpeedMatcher = windSpeedPattern.matcher(description);
+        if (windSpeedMatcher.find()) {
+            forecast.setWindSpeed(windSpeedMatcher.group(1) + "mph");
+            Log.d("WeatherParse", "Parsed Wind Speed: " + windSpeedMatcher.group(1) + "mph");
+        }
+
+        // Visibility
+        Pattern visibilityPattern = Pattern.compile("Visibility: (\\w+)");
+        Matcher visibilityMatcher = visibilityPattern.matcher(description);
+        if (visibilityMatcher.find()) {
+            forecast.setVisibility(visibilityMatcher.group(1));
+            Log.d("WeatherParse", "Parsed Visibility: " + visibilityMatcher.group(1));
+        }
+
+        // Pressure
+        Pattern pressurePattern = Pattern.compile("Pressure: (\\d+)mb");
+        Matcher pressureMatcher = pressurePattern.matcher(description);
+        if (pressureMatcher.find()) {
+            forecast.setPressure(pressureMatcher.group(1) + "mb");
+            Log.d("WeatherParse", "Parsed Pressure: " + pressureMatcher.group(1) + "mb");
+        }
+
+        // Humidity
+        Pattern humidityPattern = Pattern.compile("Humidity: (\\d+)%");
+        Matcher humidityMatcher = humidityPattern.matcher(description);
+        if (humidityMatcher.find()) {
+            forecast.setHumidity(humidityMatcher.group(1) + "%");
+            Log.d("WeatherParse", "Parsed Humidity: " + humidityMatcher.group(1) + "%");
+        }
+
+        // UV Risk
+        Pattern uvRiskPattern = Pattern.compile("UV Risk: (\\d+)");
+        Matcher uvRiskMatcher = uvRiskPattern.matcher(description);
+        if (uvRiskMatcher.find()) {
+            forecast.setUvRisk(uvRiskMatcher.group(1));
+            Log.d("WeatherParse", "Parsed UV Risk: " + uvRiskMatcher.group(1));
+        }
+
+        // Pollution
+        Pattern pollutionPattern = Pattern.compile("Pollution: (\\w+)");
+        Matcher pollutionMatcher = pollutionPattern.matcher(description);
+        if (pollutionMatcher.find()) {
+            forecast.setPollution(pollutionMatcher.group(1));
+            Log.d("WeatherParse", "Parsed Pollution: " + pollutionMatcher.group(1));
+        }
+
+        // Sunset
+        Pattern sunsetPattern = Pattern.compile("Sunset: (\\d{2}:\\d{2} [A-Z]+)");
+        Matcher sunsetMatcher = sunsetPattern.matcher(description);
+        if (sunsetMatcher.find()) {
+            forecast.setSunset(sunsetMatcher.group(1));
+            Log.d("WeatherParse", "Parsed Sunset: " + sunsetMatcher.group(1));
+        }
+    }
 }
