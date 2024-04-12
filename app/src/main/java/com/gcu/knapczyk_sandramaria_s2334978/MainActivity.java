@@ -1,25 +1,17 @@
 package com.gcu.knapczyk_sandramaria_s2334978;
 
-import static java.lang.System.in;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentContainerView;
 
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.util.Pair;
-import android.view.Gravity;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ScrollView;
@@ -32,16 +24,12 @@ import android.widget.Button;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.net.MalformedURLException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -136,7 +124,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Map<String, CopyOnWriteArrayList<ThreeDayForecast>> forecastMap = new ConcurrentHashMap<>();
     private Map<String, CopyOnWriteArrayList<Observations>> observationsMap = new ConcurrentHashMap<>();
-    private Map<Integer, Pair<String, Integer>> buttonToForecastInfo;
+    //private HashMap<Integer, Pair<String, Integer>> buttonToForecastInfo;
+    HashMap<Integer, Pair<String, Integer>> buttonToForecastInfo = new HashMap<>();
 
 
     @Override
@@ -311,6 +300,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         infoBangladesh3 = findViewById(R.id.infoBangladesh3);
         infoBangladesh3.setOnClickListener(this);
 
+
         // Map image buttons for additional info
         buttonToForecastInfo.put(R.id.infoGlasgow1, new Pair<>("Glasgow", 0));
         buttonToForecastInfo.put(R.id.infoGlasgow2, new Pair<>("Glasgow", 1));
@@ -389,7 +379,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         backButton.setOnClickListener(this);
 
         //startProgressObservations();
-        startProgressForecasts();
+        startProgressObservations();
 
         //Initialise maps fragment
         fragmentContainerView = findViewById(R.id.map);
@@ -402,39 +392,121 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-
     @Override
     public void onClick(View v) {
-        if (v == forButton) {
-            viewSwitcher.showNext();
-            startProgressForecasts();
-            Log.d("MyTag", "go to forecast screen");
-        } else if (v == nextButton1) {
-            int nextPosition = (weatherViewFlipper1.getDisplayedChild() + 1) % weatherViewFlipper1.getChildCount();
-            weatherViewFlipper1.setDisplayedChild(nextPosition);
-            locationSpinner.setSelection(nextPosition);
-            updateMapLocation(nextPosition);
-            Log.d("MyTag", "obs next screen");
-        } else if (v == prevButton1) {
-            int prevPosition = (weatherViewFlipper1.getDisplayedChild() - 1 + weatherViewFlipper1.getChildCount()) % weatherViewFlipper1.getChildCount();
-            weatherViewFlipper1.setDisplayedChild(prevPosition);
-            locationSpinner.setSelection(prevPosition);
-            updateMapLocation(prevPosition);
-            Log.d("MyTag", "obs prev screen");
-        } else if (v == nextButton2) {
-            weatherViewFlipper2.showNext();
-            Log.d("MyTag", "forecast next screen");
-        } else if (v == prevButton2) {
-            weatherViewFlipper2.showPrevious();
-            Log.d("MyTag", "forecast prev screen");
-        } else if (v == backButton) {
-            viewSwitcher.showPrevious();
-            startProgressObservations();
-            Log.d("MyTag", "back to start screen");
+        // Debug log to check the contents of the map
+        for (Map.Entry<Integer, Pair<String, Integer>> entry : buttonToForecastInfo.entrySet()) {
+            Log.d("MyTag", "Button ID: " + entry.getKey() + ", Info: " + entry.getValue().first + ", " + entry.getValue().second);
+        }
+
+        Pair<String, Integer> info = buttonToForecastInfo.get(v.getId());
+        if (info != null) {
+            // Log the value of info.first
+            Log.d("MyTag", "Info.first: " + info.first);
+
+            // Get the forecasts for the location
+            CopyOnWriteArrayList<ThreeDayForecast> forecasts = forecastMap.get(info.first);
+
+            // Log the contents of forecastMap
+            Log.d("MyTag", "ForecastMap: " + forecastMap);
+
+            // Get the forecasts for the location
+            ThreeDayForecast forecast = null;
+
+            // Check if forecasts is not null and dayIndex is within bounds
+            if (forecasts != null && info.second < forecasts.size()) {
+                // Show forecast details
+                forecast = showForecastDetails(info.first, info.second);
+            }
+            // Check if forecast is not null
+            if (forecast != null) {
+                Log.d("MyTag", "Info object: " + info.first + ", " + info.second);
+                // Create the message for the alert dialog
+                String message =
+                        "Wind Direction: " + forecast.getWindDirection() + "\n"
+                                + "Wind Speed: " + forecast.getWindSpeed() + "\n"
+                                + "Visibility: " + forecast.getVisibility() + "\n"
+                                + "Pressure: " + forecast.getPressure() + "\n"
+                                + "Humidity: " + forecast.getHumidity() + "\n"
+                                + "UV Risk: " + forecast.getUvRisk() + "\n"
+                                + "Pollution: " + forecast.getPollution() + "\n"
+                                + "Sunset: " + forecast.getSunset();
+
+                // Display the description in an alert dialog
+                new AlertDialog.Builder(MainActivity.this)
+                        .setTitle("Detailed Weather for " + info.first + ", Day " + info.second)
+                        .setMessage(message)
+                        .setPositiveButton(android.R.string.ok, null)
+                        .show();
+            } else {
+                Log.d("MyTag", "Info object is null for button ID: " + v.getId());
+                Toast.makeText(this, "Forecast data not available", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            // Handle other buttons based on their IDs
+            if (v == forButton) {
+                viewSwitcher.showNext();
+                startProgressForecasts();
+                Log.d("MyTag", "go to forecast screen");
+            } else if (v == nextButton1) {
+                int nextPosition = (weatherViewFlipper1.getDisplayedChild() + 1) % weatherViewFlipper1.getChildCount();
+                weatherViewFlipper1.setDisplayedChild(nextPosition);
+                locationSpinner.setSelection(nextPosition);
+                updateMapLocation(nextPosition);
+                Log.d("MyTag", "obs next screen");
+            } else if (v == prevButton1) {
+                int prevPosition = (weatherViewFlipper1.getDisplayedChild() - 1 + weatherViewFlipper1.getChildCount()) % weatherViewFlipper1.getChildCount();
+                weatherViewFlipper1.setDisplayedChild(prevPosition);
+                locationSpinner.setSelection(prevPosition);
+                updateMapLocation(prevPosition);
+                Log.d("MyTag", "obs prev screen");
+            } else if (v == nextButton2) {
+                weatherViewFlipper2.showNext();
+                Log.d("MyTag", "forecast next screen");
+            } else if (v == prevButton2) {
+                weatherViewFlipper2.showPrevious();
+                Log.d("MyTag", "forecast prev screen");
+            } else if (v == backButton) {
+                viewSwitcher.showPrevious();
+                startProgressObservations();
+                Log.d("MyTag", "back to start screen");
+            }
         }
     }
 
+    private ThreeDayForecast showForecastDetails(String location, int dayIndex) {
+        CopyOnWriteArrayList<ThreeDayForecast> forecasts = forecastMap.get(location);
+        if (forecasts != null && dayIndex < forecasts.size()) {
+            ThreeDayForecast forecast = forecasts.get(dayIndex);
+            // Create a detailed message from the forecast description attributes
+            String details = buildDetailMessage(forecast);
 
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(location + " Detailed Forecast for " + forecast.getDay());
+            builder.setMessage(details);
+            builder.setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
+            builder.show();
+
+            return forecast;  // Return the forecast object
+        } else {
+            Toast.makeText(this, "Forecast data not available", Toast.LENGTH_SHORT).show();
+            return null;
+        }
+    }
+
+    private String buildDetailMessage(ThreeDayForecast forecast) {
+        Log.d("WeatherDetails", "Building message for: " + forecast.getDay());
+        StringBuilder details = new StringBuilder();
+        if (forecast.getWindDirection() != null) details.append("Wind Direction: ").append(forecast.getWindDirection()).append("\n");
+        if (forecast.getWindSpeed() != null) details.append("Wind Speed: ").append(forecast.getWindSpeed()).append("\n");
+        if (forecast.getVisibility() != null) details.append("Visibility: ").append(forecast.getVisibility()).append("\n");
+        if (forecast.getPressure() != null) details.append("Pressure: ").append(forecast.getPressure()).append("\n");
+        if (forecast.getHumidity() != null) details.append("Humidity: ").append(forecast.getHumidity()).append("\n");
+        if (forecast.getUvRisk() != null) details.append("UV Risk: ").append(forecast.getUvRisk()).append("\n");
+        if (forecast.getPollution() != null) details.append("Pollution: ").append(forecast.getPollution()).append("\n");
+        if (forecast.getSunset() != null) details.append("Sunset: ").append(forecast.getSunset()).append("\n");
+        return details.toString();
+    }
 
     // Start the task with both URLs
     public void startProgressObservations() {
@@ -619,21 +691,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.d("MyTag", "Forecast Task started");
 
             for (String url : urls) {
-                CopyOnWriteArrayList<ThreeDayForecast> currentForecasts = new CopyOnWriteArrayList<>();
-                fetchDataAndParse(url, currentForecasts);
+                try {
+                    CopyOnWriteArrayList<ThreeDayForecast> currentForecasts = new CopyOnWriteArrayList<>();
+                    fetchDataAndParse(url, currentForecasts);
 
-                // Resolve URL to location name
-                String locationName = getLocationNameFromUrl(url);
+                    // Resolve URL to location name
+                    String locationName = getLocationNameFromUrl(url);
 
-                // Ensure location name is valid
-                if (locationName != null) {
-                    // Update UI on the main thread
+
                     runOnUiThread(() -> updateForecastViews(locationName, currentForecasts));
-                } else {
-                    Log.e("MyTag", "Failed to resolve location name from URL: " + url);
+
+
+                } catch (Exception e) {
+                    Log.e("MyTag", "Error in fetching or parsing data: " + e.getMessage());
                 }
             }
         }
+
+
 
         private void fetchDataAndParse(String urlString, CopyOnWriteArrayList<ThreeDayForecast> currentForecasts) {
             try {
@@ -757,11 +832,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             xpp.setInput(in, null);
             int eventType = xpp.getEventType();
             ThreeDayForecast newForecast = null;
+            String locationName = null;
 
             while (eventType != XmlPullParser.END_DOCUMENT) {
                 if (eventType == XmlPullParser.START_TAG) {
-                    if (xpp.getName().equalsIgnoreCase("item")) {
+                    if (xpp.getName().equalsIgnoreCase("channel")) {
+                        // Parse the title to get the location name
+                        int nextEvent = xpp.next();
+                        if (nextEvent == XmlPullParser.TEXT) {
+                            String title = xpp.getText();
+                            locationName = title.replace("BBC Weather - Forecast for", "").trim();
+                        }
+                    } else if (xpp.getName().equalsIgnoreCase("item")) {
                         newForecast = new ThreeDayForecast();
+                        newForecast.setLocationName(locationName);
                     } else if (newForecast != null) {
                         if (xpp.getName().equalsIgnoreCase("title")) {
                             String title = xpp.nextText();

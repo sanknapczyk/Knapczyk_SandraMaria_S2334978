@@ -1,6 +1,7 @@
 package com.gcu.knapczyk_sandramaria_s2334978;
 
 public class ThreeDayForecast {
+    private String locationName;
     private String title;
     private String description;
     private String date;
@@ -22,6 +23,13 @@ public class ThreeDayForecast {
     }
 
     // Getter and Setter methods
+    public String getLocationName() {
+        return locationName;
+    }
+
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
+    }
     public String getTitle() {
         return title;
     }
