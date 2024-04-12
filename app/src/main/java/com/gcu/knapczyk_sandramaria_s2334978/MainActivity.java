@@ -418,30 +418,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // Show forecast details
                 forecast = showForecastDetails(info.first, info.second);
             }
-            // Check if forecast is not null
-            if (forecast != null) {
-                Log.d("MyTag", "Info object: " + info.first + ", " + info.second);
-                // Create the message for the alert dialog
-                String message =
-                        "Wind Direction: " + forecast.getWindDirection() + "\n"
-                                + "Wind Speed: " + forecast.getWindSpeed() + "\n"
-                                + "Visibility: " + forecast.getVisibility() + "\n"
-                                + "Pressure: " + forecast.getPressure() + "\n"
-                                + "Humidity: " + forecast.getHumidity() + "\n"
-                                + "UV Risk: " + forecast.getUvRisk() + "\n"
-                                + "Pollution: " + forecast.getPollution() + "\n"
-                                + "Sunset: " + forecast.getSunset();
-
-                // Display the description in an alert dialog
-                new AlertDialog.Builder(MainActivity.this)
-                        .setTitle("Detailed Weather for " + info.first + ", Day " + info.second)
-                        .setMessage(message)
-                        .setPositiveButton(android.R.string.ok, null)
-                        .show();
-            } else {
-                Log.d("MyTag", "Info object is null for button ID: " + v.getId());
-                Toast.makeText(this, "Forecast data not available", Toast.LENGTH_SHORT).show();
-            }
         } else {
             // Handle other buttons based on their IDs
             if (v == forButton) {
@@ -692,15 +668,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             for (String url : urls) {
                 try {
-                    CopyOnWriteArrayList<ThreeDayForecast> currentForecasts = new CopyOnWriteArrayList<>();
-                    fetchDataAndParse(url, currentForecasts);
-
                     // Resolve URL to location name
                     String locationName = getLocationNameFromUrl(url);
 
+                    // Fetch and parse data, then put it into the map
+                    forecastMap.put(locationName, fetchDataAndParse(url));
 
-                    runOnUiThread(() -> updateForecastViews(locationName, currentForecasts));
-
+                    runOnUiThread(() -> updateForecastViews(locationName, forecastMap.get(locationName)));
 
                 } catch (Exception e) {
                     Log.e("MyTag", "Error in fetching or parsing data: " + e.getMessage());
@@ -708,9 +682,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
 
-
-
-        private void fetchDataAndParse(String urlString, CopyOnWriteArrayList<ThreeDayForecast> currentForecasts) {
+        private CopyOnWriteArrayList<ThreeDayForecast> fetchDataAndParse(String urlString) {
+            CopyOnWriteArrayList<ThreeDayForecast> currentForecasts = new CopyOnWriteArrayList<>();
             try {
                 URL url = new URL(urlString);
                 URLConnection yc = url.openConnection();
@@ -720,6 +693,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             } catch (IOException e) {
                 Log.e("MyTag", "IOException in fetchDataAndParse", e);
             }
+            return currentForecasts;
         }
 
         private void updateForecastViews(String locationName, CopyOnWriteArrayList<ThreeDayForecast> forecasts) {
