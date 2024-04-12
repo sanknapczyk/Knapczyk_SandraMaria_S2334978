@@ -124,6 +124,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private Map<String, CopyOnWriteArrayList<ThreeDayForecast>> forecastMap = new ConcurrentHashMap<>();
     private Map<String, CopyOnWriteArrayList<Observations>> observationsMap = new ConcurrentHashMap<>();
+
     //private HashMap<Integer, Pair<String, Integer>> buttonToForecastInfo;
     HashMap<Integer, Pair<String, Integer>> buttonToForecastInfo = new HashMap<>();
 
