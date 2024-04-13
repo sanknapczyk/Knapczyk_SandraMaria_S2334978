@@ -1,6 +1,6 @@
 <!--   MPD XML Starter code - main diet 2023-2024   -->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:map="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent" android:layout_height="fill_parent" android:fillViewport="true" android:background="@color/SlateGray"
-    android:id="@+id/scrollView">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:map="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent" android:layout_height="fill_parent" android:fillViewport="true" android:background="@color/SlateGray"
+    android:id="@+id/mainView">
     <!--  Starting Screen Layout  -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -30,11 +30,16 @@
                     android:textSize="12sp"/>
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    >
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Choose location:"/>
+                        android:text="Choose location:"
+                        android:layout_gravity="center"
+                        android:layout_marginTop="10dp"
+                        android:textSize="18dp"/>
                     <Spinner
                         android:id="@+id/location_spinner"
                         android:layout_width="match_parent"
@@ -599,16 +604,18 @@
                     <androidx.fragment.app.FragmentContainerView
                         android:id="@+id/map"
                         android:name="com.google.android.gms.maps.SupportMapFragment"
-                        android:layout_width="match_parent"
-                        android:layout_height="400dp"
+                        android:layout_width="300dp"
+                        android:layout_height="300dp"
                         android:layout_gravity="center"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginBottom="20dp"
                         />
                 </LinearLayout>
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="70dp"
                     android:orientation="horizontal"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginBottom="10dp"
                     >
 
                     <ImageButton
@@ -617,7 +624,7 @@
                         android:layout_height="match_parent"
                         android:background="@drawable/arrow_prev"
                         android:backgroundTint="@color/White"
-                        />
+                        tools:ignore="SpeakableTextPresentCheck" />
                     <Button
                         android:id="@+id/forButton"
                         android:layout_width="match_parent"
@@ -634,7 +641,7 @@
                         android:layout_height="match_parent"
                         android:background="@drawable/arrow_next"
                         android:backgroundTint="@color/White"
-                        />
+                        tools:ignore="SpeakableTextPresentCheck" />
                 </LinearLayout>
             </LinearLayout>
             <LinearLayout
@@ -952,7 +959,8 @@
                                 android:scaleType="centerInside"
                                 android:src="@drawable/more"
                                 map:tint="@color/White"
-                                tools:ignore="SpeakableTextPresentCheck" />
+                                tools:ignore="SpeakableTextPresentCheck"
+                                android:backgroundTint="@null"/>
                         </LinearLayout>
                         <LinearLayout
                             android:layout_width="match_parent"
@@ -1808,9 +1816,8 @@
 
                     <ImageButton
                         android:id="@+id/buttonPrevious2"
-                        android:layout_width="wrap_content"
+                        android:layout_width="65dp"
                         android:layout_height="match_parent"
-                        android:layout_weight="1"
                         android:background="@drawable/arrow_prev"
                         android:backgroundTint="@color/White"
                         tools:ignore="SpeakableTextPresentCheck" />
@@ -1821,13 +1828,13 @@
                         android:layout_height="wrap_content"
                         android:text="OBSERVATIONS"
                         android:backgroundTint="@color/White"
-                        android:textColor="@color/Black"/>
+                        android:textColor="@color/Black"
+                        android:layout_weight="1"/>
 
                     <ImageButton
                         android:id="@+id/buttonNext2"
-                        android:layout_width="match_parent"
+                        android:layout_width="65dp"
                         android:layout_height="match_parent"
-                        android:layout_weight="1"
                         android:background="@drawable/arrow_next"
                         android:backgroundTint="@color/White"
                         tools:ignore="SpeakableTextPresentCheck" />
@@ -1835,4 +1842,4 @@
             </LinearLayout>
         </ViewSwitcher>
     </LinearLayout>
-</ScrollView>
+</LinearLayout>

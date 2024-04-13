@@ -2,6 +2,7 @@ package com.gcu.knapczyk_sandramaria_s2334978;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentContainerView;
 
 
@@ -14,6 +15,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -47,7 +49,7 @@ import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback {
     private GoogleMap googleMap;
-    private ScrollView scrollView;
+    private LinearLayout mainView;
     private ViewSwitcher viewSwitcher;
     private FragmentContainerView fragmentContainerView;
     private ViewFlipper weatherViewFlipper1, weatherViewFlipper2;
@@ -125,7 +127,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Map<String, CopyOnWriteArrayList<ThreeDayForecast>> forecastMap = new ConcurrentHashMap<>();
     private Map<String, CopyOnWriteArrayList<Observations>> observationsMap = new ConcurrentHashMap<>();
 
-    //private HashMap<Integer, Pair<String, Integer>> buttonToForecastInfo;
+    //
     HashMap<Integer, Pair<String, Integer>> buttonToForecastInfo = new HashMap<>();
 
 
@@ -134,6 +136,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setTheme(R.style.Base_Theme_Knapczyk_SandraMaria_S2334978);
         setContentView(R.layout.activity_main);
+
+        mainView = findViewById(R.id.mainView);
+        mainView.setBackground(ContextCompat.getDrawable(this, R.drawable.clouds_blue_sky));
 
         // Initialize TextViews for 6 locations
         glasgowDay = findViewById(R.id.glasgowDay);
@@ -324,7 +329,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         // Set up link to layout views
-        scrollView = (ScrollView) findViewById(R.id.scrollView);
         viewSwitcher = findViewById(R.id.viewSwitcher);
         if (viewSwitcher == null) {
             Toast.makeText(getApplicationContext(), "Null ViewSwitcher",
@@ -781,8 +785,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     return R.drawable.heavy_rain;
                 case "Thundery Showers":
                     return R.drawable.thundery;
+                case "Mist":
+                    return R.drawable.mist;
                 default:
-                    return R.drawable.cloudy; // Default icon
+                    return R.drawable.question; // Default icon
             }
         }
 
