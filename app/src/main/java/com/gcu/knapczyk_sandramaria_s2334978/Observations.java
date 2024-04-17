@@ -2,6 +2,7 @@ package com.gcu.knapczyk_sandramaria_s2334978;
 
 public class Observations {
     private String day;
+    private String date;
     private String temperature;
     private String pressure;
     private String windSpeed;
@@ -10,6 +11,13 @@ public class Observations {
     public String getDay() { return day; }
     public void setDay(String day) { this.day = day; }
 
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
     public String getTemperature() { return temperature; }
     public void setTemperature(String temperature) { this.temperature = temperature; }
 
