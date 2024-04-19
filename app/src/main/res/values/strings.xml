@@ -1,6 +1,22 @@
 <resources>
     <string name="app_name">Knapczyk_SandraMaria_S2334978</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string name="welcome_to_the_weather_app">Welcome to the weather app\n</string>
+    <string name="contains_bbc_weather_data_from_public_rss">Contains BBC weather data from public RSS</string>
+    <string name="choose_location">Choose location:</string>
+    <string name="go_to_forecast">Go to forecast</string>
+    <string name="s2334978">S2334978</string>
+    <string name="_3_day_forecast">3 day forecast</string>
+    <string name="glasgow">Glasgow</string>
+    <string name="day">DAY</string>
+    <string name="max_temp">MAX TEMP</string>
+    <string name="min_temp">MIN TEMP</string>
+    <string name="london">London</string>
+    <string name="new_york">New York</string>
+    <string name="oman">Oman</string>
+    <string name="mauritius">Mauritius</string>
+    <string name="bangladesh">Bangladesh</string>
+    <string name="observations">Observations</string>
     <string-array name="locations_array">
         <item>Glasgow</item>
         <item>London</item>

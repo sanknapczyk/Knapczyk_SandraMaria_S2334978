@@ -3,14 +3,14 @@ package com.gcu.knapczyk_sandramaria_s2334978;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentContainerView;
 
 
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.CalendarContract;
 import android.util.Log;
 import android.util.Pair;
@@ -20,7 +20,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,10 +27,6 @@ import android.widget.ViewSwitcher;
 import android.widget.ViewFlipper;
 import android.widget.Button;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.GlideBuilder;
-import com.bumptech.glide.annotation.GlideModule;
-import com.bumptech.glide.module.AppGlideModule;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -39,40 +34,28 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
-
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, OnMapReadyCallback {
     private GoogleMap googleMap;
-    private LinearLayout mainView;
     private ViewSwitcher viewSwitcher;
-    private FragmentContainerView fragmentContainerView;
     private ViewFlipper weatherViewFlipper1, weatherViewFlipper2;
     private Button backButton, forButton;
     private ImageButton nextButton1, prevButton1, nextButton2, prevButton2;
     private ImageButton calendarButton, notesButton;
-    private ImageButton infoGlasgow1, infoGlasgow2, infoGlasgow3, infoLondon1, infoLondon2, infoLondon3, infoNewYork1, infoNewYork2, infoNewYork3, infoOman1, infoOman2, infoOman3, infoMauritius1, infoMauritius2, infoMauritius3, infoBangladesh1, infoBangladesh2, infoBangladesh3;
     private Spinner locationSpinner;
-    private TextView dayDate;
+    private TextView dayDate, dayDate1;
     // Glasgow 3-day forecast text views
     private TextView glasgowDay1, glasgowMax1, glasgowMin1, glasgowDay2, glasgowMax2, glasgowMin2, glasgowDay3, glasgowMax3, glasgowMin3;
 
@@ -91,24 +74,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // Bangladesh 3-day forecast text views
     private TextView bangladeshDay1, bangladeshMax1, bangladeshMin1, bangladeshDay2, bangladeshMax2, bangladeshMin2, bangladeshDay3, bangladeshMax3, bangladeshMin3;
 
-    // Glasgow observation textviews
-    private TextView glasgowDay, glasgowTemperature, glasgowPressure, glasgowWind;
-
-    // London observation textviews
-    private TextView londonDay, londonTemperature, londonPressure, londonWind;
-
-    // New York observation textviews
-    private TextView newYorkDay, newYorkTemperature, newYorkPressure, newYorkWind;
-
-    // Oman observation textviews
-    private TextView omanDay, omanTemperature, omanPressure, omanWind;
-
-    // Mauritius observation textviews
-    private TextView mauritiusDay, mauritiusTemperature, mauritiusPressure, mauritiusWind;
-
-    // Bangladesh observation textviews
-    private TextView bangladeshDay, bangladeshTemperature, bangladeshPressure, bangladeshWind;
-
     // Image views for forecast
     private ImageView glasgowIcon1, glasgowIcon2, glasgowIcon3, londonIcon1, londonIcon2, londonIcon3, newYorkIcon1, newYorkIcon2, newYorkIcon3, omanIcon1, omanIcon2, omanIcon3, mauritiusIcon1, mauritiusIcon2, mauritiusIcon3, bangladeshIcon1, bangladeshIcon2, bangladeshIcon3;
 
@@ -122,8 +87,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             new LatLng(24.2079, 90.2569)  // Bangladesh
     };
 
-    private Task2 task2;
-    private String[] observationUrls = {
+    private final String[] observationUrls = {
             "https://weather-broker-cdn.api.bbci.co.uk/en/observation/rss/2648579",
             "https://weather-broker-cdn.api.bbci.co.uk/en/observation/rss/2643743",
             "https://weather-broker-cdn.api.bbci.co.uk/en/observation/rss/5128581",
@@ -132,8 +96,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             "https://weather-broker-cdn.api.bbci.co.uk/en/observation/rss/1185241"
     };
 
-    private Task task;
-    private String[] forecastUrls = {
+    private final String[] forecastUrls = {
             "https://weather-broker-cdn.api.bbci.co.uk/en/forecast/rss/3day/2648579",
             "https://weather-broker-cdn.api.bbci.co.uk/en/forecast/rss/3day/2643743",
             "https://weather-broker-cdn.api.bbci.co.uk/en/forecast/rss/3day/5128581",
@@ -142,12 +105,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             "https://weather-broker-cdn.api.bbci.co.uk/en/forecast/rss/3day/1185241"
     };
 
-    private Map<String, CopyOnWriteArrayList<ThreeDayForecast>> forecastMap = new ConcurrentHashMap<>();
-    private Map<String, CopyOnWriteArrayList<Observations>> observationsMap = new ConcurrentHashMap<>();
+    private final Map<String, CopyOnWriteArrayList<ThreeDayForecast>> forecastMap = new ConcurrentHashMap<>();
+    private final Map<String, CopyOnWriteArrayList<Observations>> observationsMap = new ConcurrentHashMap<>();
 
     //
     HashMap<Integer, Pair<String, Integer>> buttonToForecastInfo = new HashMap<>();
+    private Map<String, TextView[]> urlToTextViewsMap;
 
+    private ScheduledExecutorService scheduler;
+    private Handler mainHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,39 +121,58 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setTheme(R.style.Base_Theme_Knapczyk_SandraMaria_S2334978);
         setContentView(R.layout.activity_main);
 
-        mainView = findViewById(R.id.mainView);
+        LinearLayout mainView = findViewById(R.id.mainView);
         mainView.setBackground(ContextCompat.getDrawable(this, R.drawable.clouds_blue_sky));
 
+        // Initialize the scheduler and handler
+        this.scheduler = Executors.newScheduledThreadPool(1);
+        this.mainHandler = new Handler(Looper.getMainLooper());
+
         // Initialize TextViews for 6 locations
-        glasgowDay = findViewById(R.id.glasgowDay);
-        glasgowTemperature = findViewById(R.id.glasgowTemperature);
-        glasgowPressure = findViewById(R.id.glasgowPressure);
-        glasgowWind = findViewById(R.id.glasgowWind);
+        // Glasgow observation textviews
+        TextView glasgowDay = findViewById(R.id.glasgowDay);
+        TextView glasgowTemperature = findViewById(R.id.glasgowTemperature);
+        TextView glasgowPressure = findViewById(R.id.glasgowPressure);
+        TextView glasgowWind = findViewById(R.id.glasgowWind);
 
-        londonDay = findViewById(R.id.londonDay);
-        londonTemperature = findViewById(R.id.londonTemperature);
-        londonPressure = findViewById(R.id.londonPressure);
-        londonWind = findViewById(R.id.londonWind);
+        // London observation textviews
+        TextView londonDay = findViewById(R.id.londonDay);
+        TextView londonTemperature = findViewById(R.id.londonTemperature);
+        TextView londonPressure = findViewById(R.id.londonPressure);
+        TextView londonWind = findViewById(R.id.londonWind);
 
-        newYorkDay = findViewById(R.id.newYorkDay);
-        newYorkTemperature = findViewById(R.id.newYorkTemperature);
-        newYorkPressure = findViewById(R.id.newYorkPressure);
-        newYorkWind = findViewById(R.id.newYorkWind);
+        // New York observation textviews
+        TextView newYorkDay = findViewById(R.id.newYorkDay);
+        TextView newYorkTemperature = findViewById(R.id.newYorkTemperature);
+        TextView newYorkPressure = findViewById(R.id.newYorkPressure);
+        TextView newYorkWind = findViewById(R.id.newYorkWind);
 
-        omanDay = findViewById(R.id.omanDay);
-        omanTemperature = findViewById(R.id.omanTemperature);
-        omanPressure = findViewById(R.id.omanPressure);
-        omanWind = findViewById(R.id.omanWind);
+        // Oman observation textviews
+        TextView omanDay = findViewById(R.id.omanDay);
+        TextView omanTemperature = findViewById(R.id.omanTemperature);
+        TextView omanPressure = findViewById(R.id.omanPressure);
+        TextView omanWind = findViewById(R.id.omanWind);
 
-        mauritiusDay = findViewById(R.id.mauritiusDay);
-        mauritiusTemperature = findViewById(R.id.mauritiusTemperature);
-        mauritiusPressure = findViewById(R.id.mauritiusPressure);
-        mauritiusWind = findViewById(R.id.mauritiusWind);
+        // Mauritius observation textviews
+        TextView mauritiusDay = findViewById(R.id.mauritiusDay);
+        TextView mauritiusTemperature = findViewById(R.id.mauritiusTemperature);
+        TextView mauritiusPressure = findViewById(R.id.mauritiusPressure);
+        TextView mauritiusWind = findViewById(R.id.mauritiusWind);
 
-        bangladeshDay = findViewById(R.id.bangladeshDay);
-        bangladeshTemperature = findViewById(R.id.bangladeshTemperature);
-        bangladeshPressure = findViewById(R.id.bangladeshPressure);
-        bangladeshWind = findViewById(R.id.bangladeshWind);
+        // Bangladesh observation textviews
+        TextView bangladeshDay = findViewById(R.id.bangladeshDay);
+        TextView bangladeshTemperature = findViewById(R.id.bangladeshTemperature);
+        TextView bangladeshPressure = findViewById(R.id.bangladeshPressure);
+        TextView bangladeshWind = findViewById(R.id.bangladeshWind);
+
+        // Initialize the map
+        urlToTextViewsMap = new HashMap<>();
+        urlToTextViewsMap.put(observationUrls[0], new TextView[]{glasgowDay, glasgowTemperature, glasgowPressure, glasgowWind});
+        urlToTextViewsMap.put(observationUrls[1], new TextView[]{londonDay, londonTemperature, londonPressure, londonWind});
+        urlToTextViewsMap.put(observationUrls[2], new TextView[]{newYorkDay, newYorkTemperature, newYorkPressure, newYorkWind});
+        urlToTextViewsMap.put(observationUrls[3], new TextView[]{omanDay, omanTemperature, omanPressure, omanWind});
+        urlToTextViewsMap.put(observationUrls[4], new TextView[]{mauritiusDay, mauritiusTemperature, mauritiusPressure, mauritiusWind});
+        urlToTextViewsMap.put(observationUrls[5], new TextView[]{bangladeshDay, bangladeshTemperature, bangladeshPressure, bangladeshWind});
 
         // Set text views for 3day forecast
         // Initialize Glasgow TextViews
@@ -277,51 +262,51 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         bangladeshIcon3 = findViewById(R.id.bangladeshIcon3);
 
         // Initialize Glasgow ImageButtons
-        infoGlasgow1 = findViewById(R.id.infoGlasgow1);
+        ImageButton infoGlasgow1 = findViewById(R.id.infoGlasgow1);
         infoGlasgow1.setOnClickListener(this);
-        infoGlasgow2 = findViewById(R.id.infoGlasgow2);
+        ImageButton infoGlasgow2 = findViewById(R.id.infoGlasgow2);
         infoGlasgow2.setOnClickListener(this);
-        infoGlasgow3 = findViewById(R.id.infoGlasgow3);
+        ImageButton infoGlasgow3 = findViewById(R.id.infoGlasgow3);
         infoGlasgow3.setOnClickListener(this);
 
         // Initialize London ImageButtons
-        infoLondon1 = findViewById(R.id.infoLondon1);
+        ImageButton infoLondon1 = findViewById(R.id.infoLondon1);
         infoLondon1.setOnClickListener(this);
-        infoLondon2 = findViewById(R.id.infoLondon2);
+        ImageButton infoLondon2 = findViewById(R.id.infoLondon2);
         infoLondon2.setOnClickListener(this);
-        infoLondon3 = findViewById(R.id.infoLondon3);
+        ImageButton infoLondon3 = findViewById(R.id.infoLondon3);
         infoLondon3.setOnClickListener(this);
 
         // Initialize New York ImageButtons
-        infoNewYork1 = findViewById(R.id.infoNewYork1);
+        ImageButton infoNewYork1 = findViewById(R.id.infoNewYork1);
         infoNewYork1.setOnClickListener(this);
-        infoNewYork2 = findViewById(R.id.infoNewYork2);
+        ImageButton infoNewYork2 = findViewById(R.id.infoNewYork2);
         infoNewYork2.setOnClickListener(this);
-        infoNewYork3 = findViewById(R.id.infoNewYork3);
+        ImageButton infoNewYork3 = findViewById(R.id.infoNewYork3);
         infoNewYork3.setOnClickListener(this);
 
         // Initialize Oman ImageButtons
-        infoOman1 = findViewById(R.id.infoOman1);
+        ImageButton infoOman1 = findViewById(R.id.infoOman1);
         infoOman1.setOnClickListener(this);
-        infoOman2 = findViewById(R.id.infoOman2);
+        ImageButton infoOman2 = findViewById(R.id.infoOman2);
         infoOman2.setOnClickListener(this);
-        infoOman3 = findViewById(R.id.infoOman3);
+        ImageButton infoOman3 = findViewById(R.id.infoOman3);
         infoOman3.setOnClickListener(this);
 
         // Initialize Mauritius ImageButtons
-        infoMauritius1 = findViewById(R.id.infoMauritius1);
+        ImageButton infoMauritius1 = findViewById(R.id.infoMauritius1);
         infoMauritius1.setOnClickListener(this);
-        infoMauritius2 = findViewById(R.id.infoMauritius2);
+        ImageButton infoMauritius2 = findViewById(R.id.infoMauritius2);
         infoMauritius2.setOnClickListener(this);
-        infoMauritius3 = findViewById(R.id.infoMauritius3);
+        ImageButton infoMauritius3 = findViewById(R.id.infoMauritius3);
         infoMauritius3.setOnClickListener(this);
 
         // Initialize Bangladesh ImageButtons
-        infoBangladesh1 = findViewById(R.id.infoBangladesh1);
+        ImageButton infoBangladesh1 = findViewById(R.id.infoBangladesh1);
         infoBangladesh1.setOnClickListener(this);
-        infoBangladesh2 = findViewById(R.id.infoBangladesh2);
+        ImageButton infoBangladesh2 = findViewById(R.id.infoBangladesh2);
         infoBangladesh2.setOnClickListener(this);
-        infoBangladesh3 = findViewById(R.id.infoBangladesh3);
+        ImageButton infoBangladesh3 = findViewById(R.id.infoBangladesh3);
         infoBangladesh3.setOnClickListener(this);
 
         // Initialise Image Buttons for calendar and notes app
@@ -351,12 +336,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         buttonToForecastInfo.put(R.id.infoBangladesh3, new Pair<>("Bangladesh", 2));
 
         dayDate = (findViewById(R.id.dayDate));
+        dayDate1 = (findViewById(R.id.dayDate1));
 
         // Set up link to layout views
         viewSwitcher = findViewById(R.id.viewSwitcher);
         if (viewSwitcher == null) {
             Toast.makeText(getApplicationContext(), "Null ViewSwitcher",
-                    Toast.LENGTH_LONG);
+                    Toast.LENGTH_LONG).show();
             Log.e(getPackageName(), "null pointer");
         }
 
@@ -412,20 +398,25 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         startProgressObservations();
 
         // Initialize Tasks with the URLs
-        task2 = new Task2(observationUrls);
-        task = new Task(forecastUrls);
-        // Start Task2
-        task2.start();
-        task.start();
-
-        //Initialise maps fragment
-        fragmentContainerView = findViewById(R.id.map);
+        ObservationThread observationThread = new ObservationThread(observationUrls, scheduler, mainHandler);
+        ForecastThread forecastThread = new ForecastThread(forecastUrls, scheduler, mainHandler);
+        // Start ObservationThread
+        observationThread.start();
+        forecastThread.start();
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         if (mapFragment != null) {
             mapFragment.getMapAsync(this); // to the OnMapReadyCallback
+        }
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Properly shutdown the executor when the activity is destroyed
+        if (scheduler != null && !scheduler.isShutdown()) {
+            scheduler.shutdownNow();
         }
     }
 
@@ -438,22 +429,23 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Pair<String, Integer> info = buttonToForecastInfo.get(v.getId());
         if (info != null) {
-            // Log the value of info.first
-            Log.d("MyTag", "Info.first: " + info.first);
+            // Retrieve the location name and day index
+            String locationName = info.first;
+            Integer dayIndex = info.second;
 
-            // Get the forecasts for the location
-            CopyOnWriteArrayList<ThreeDayForecast> forecasts = forecastMap.get(info.first);
+            // Log info values
+            Log.d("MyTag", "Location: " + locationName + ", Day Index: " + dayIndex);
 
-            // Log the contents of forecastMap
+            // Retrieve forecasts for the location and log the entire map once
+            CopyOnWriteArrayList<ThreeDayForecast> forecasts = forecastMap.get(locationName);
             Log.d("MyTag", "ForecastMap: " + forecastMap);
 
-            // Get the forecasts for the location
-            ThreeDayForecast forecast = null;
-
-            // Check if forecasts is not null and dayIndex is within bounds
-            if (forecasts != null && info.second < forecasts.size()) {
-                // Show forecast details
-                forecast = showForecastDetails(info.first, info.second);
+            // Handle the forecast retrieval and display
+            if (forecasts != null && dayIndex < forecasts.size()) {
+                // Show forecast details if valid
+                showForecastDetails(locationName, dayIndex);
+            } else {
+                Log.d("MyTag", "No forecast available for " + locationName + " on day index " + dayIndex);
             }
         } else {
             // Handle other buttons based on their IDs
@@ -499,7 +491,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private ThreeDayForecast showForecastDetails(String location, int dayIndex) {
+    private void showForecastDetails(String location, int dayIndex) {
         CopyOnWriteArrayList<ThreeDayForecast> forecasts = forecastMap.get(location);
         if (forecasts != null && dayIndex < forecasts.size()) {
             ThreeDayForecast forecast = forecasts.get(dayIndex);
@@ -512,10 +504,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             builder.setPositiveButton("OK", (dialog, which) -> dialog.dismiss());
             builder.show();
 
-            return forecast;  // Return the forecast object
         } else {
             Toast.makeText(this, "Forecast data not available", Toast.LENGTH_SHORT).show();
-            return null;
         }
     }
 
@@ -536,14 +526,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     // Start the task with both URLs
     public void startProgressObservations() {
         Log.d("MyTag", "Starting observations progress");
-        new Thread(new Task2(observationUrls)).start();
+        // Create a new ObservationThread object with dependencies
+        ObservationThread observationThread = new ObservationThread(observationUrls, scheduler, mainHandler);
+        observationThread.start(); // Start the task
     }
 
 
     public void startProgressForecasts() {
         Log.d("MyTag", "Starting forecasts progress");
-        new Thread(new Task(forecastUrls)).start();
-
+        // Create a new ForecastThread object with dependencies
+        ForecastThread forecastThread = new ForecastThread(forecastUrls, scheduler, mainHandler);
+        forecastThread.start(); // Start the forecastThread
     }
 
     @Override
@@ -561,226 +554,75 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         LatLng selectedLocation = CITY_COORDINATES[position];
         googleMap.clear(); // Clear existing markers if any
         googleMap.addMarker(new MarkerOptions().position(selectedLocation).title("Marker in " + locationSpinner.getSelectedItem().toString()));
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLocation, 10)); // Zoom can be adjusted as needed
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(selectedLocation, 10)); // Zoom
     }
 
 
-    public class Task2 implements Runnable {
-        private String[] urls;
-        private ScheduledExecutorService scheduler;
+    public class ObservationThread implements Runnable {
+        private final String[] urls;
+        private final ScheduledExecutorService scheduler;
+        private final Handler mainHandler;
+        private final ObservationsParser observationsParser = new ObservationsParser();
 
-        public Task2(String[] urls) {
+        public ObservationThread(String[] urls, ScheduledExecutorService scheduler, Handler mainHandler) {
             this.urls = urls;
-            this.scheduler = Executors.newScheduledThreadPool(1);
+            this.scheduler = scheduler;
+            this.mainHandler = mainHandler;
         }
 
         public void start() {
-            // Run immediately at the start in a new thread
-            new Thread(this::run).start();
-
-            // Calculate delay until next 08:00 or 20:00
-            long delay = calculateDelay();
-
-            // Schedule the task to run twice daily
-            scheduler.scheduleAtFixedRate(this, delay, 12, TimeUnit.HOURS);
-        }
-
-        private long calculateDelay() {
-            // Get the current time
-            Calendar now = Calendar.getInstance();
-
-            // Get the next 08:00
-            Calendar nextMorning = (Calendar) now.clone();
-            nextMorning.set(Calendar.HOUR_OF_DAY, 8);
-            nextMorning.set(Calendar.MINUTE, 0);
-            nextMorning.set(Calendar.SECOND, 0);
-
-            // If it's already past 08:00, get the next day's 08:00
-            if (now.after(nextMorning)) {
-                nextMorning.add(Calendar.DATE, 1);
-            }
-
-            // Get the next 20:00
-            Calendar nextEvening = (Calendar) now.clone();
-            nextEvening.set(Calendar.HOUR_OF_DAY, 20);
-            nextEvening.set(Calendar.MINUTE, 0);
-            nextEvening.set(Calendar.SECOND, 0);
-
-            // If it's already past 20:00, get the next day's 20:00
-            if (now.after(nextEvening)) {
-                nextEvening.add(Calendar.DATE, 1);
-            }
-
-            // Get the next 08:00 or 20:00, whichever is sooner
-            Calendar nextRunTime = nextMorning.before(nextEvening) ? nextMorning : nextEvening;
-
-            // Calculate the delay until the next run time
-            long delay = nextRunTime.getTimeInMillis() - now.getTimeInMillis();
-
-            // Return the delay in milliseconds
-            return delay;
+            scheduler.execute(this);
+            long delay = calculateNextRunDelay();
+            scheduler.scheduleAtFixedRate(this, delay, TimeUnit.HOURS.toMillis(12), TimeUnit.MILLISECONDS);
         }
 
         @Override
         public void run() {
-            Log.d("MyTag", "Task2 started");
-
             for (String url : urls) {
-                // Create a new list for the current URL's observations
-                CopyOnWriteArrayList<Observations> currentObservations = new CopyOnWriteArrayList<>();
+                try (InputStream in = new URL(url).openConnection().getInputStream()) {
+                    // Parse the data from the stream
+                    List<Observations> currentObservations = observationsParser.parse(in);
 
-                // Fetch and process data into the current list
-                fetchDataAndParse(url, currentObservations);
+                    // Convert List to CopyOnWriteArrayList for thread safety if needed
+                    CopyOnWriteArrayList<Observations> threadSafeList = new CopyOnWriteArrayList<>(currentObservations);
 
-                // Store the list in the map, keyed by URL
-                observationsMap.put(url, currentObservations);
+                    // Store the parsed data into the map
+                    observationsMap.put(url, threadSafeList);
 
-                // Use the current list to update the UI
-                runOnUiThread(() -> updateLocationViews(currentObservations, url));
-            }
-        }
-
-        private void fetchDataAndParse(String urlString, CopyOnWriteArrayList<Observations> currentObservations) {
-            try {
-                URL url = new URL(urlString);
-                URLConnection yc = url.openConnection();
-                try (InputStream in = yc.getInputStream()) {
-                    parseDataO(in, currentObservations); // Parse the input stream
+                    // Now trigger any UI updates or further processing
+                    mainHandler.post(() -> updateUI(threadSafeList, url));
+                } catch (Exception e) {
+                    Log.e("ObservationThread", "Failed to fetch or parse data", e);
                 }
-            } catch (IOException e) {
-                Log.e("MyTag", "IOException in fetchDataAndParse", e);
             }
         }
 
+
+        private void updateUI(CopyOnWriteArrayList<Observations> observations, String url) {
+            updateLocationViews(observations, url);
+        }
 
         private void updateLocationViews(CopyOnWriteArrayList<Observations> observations, String url) {
-            // As each URL corresponds to a single observation
             if (!observations.isEmpty()) {
                 Observations observation = observations.get(0);
-
-                // assigning parsed elements to text views in locations
-                if (url.equals(observationUrls[0])) { // Glasgow's URL
-                    updateViewsForLocation(observation, glasgowDay, glasgowTemperature, glasgowPressure, glasgowWind);
-                    Log.d("LocationData", "Updating UI for Glasgow");
-                } else if (url.equals(observationUrls[1])) { // London's URL
-                    updateViewsForLocation(observation, londonDay, londonTemperature, londonPressure, londonWind);
-                    Log.d("LocationData", "Updating UI for London");
-                } else if (url.equals(observationUrls[2])) { // NewYork's URL
-                    updateViewsForLocation(observation, newYorkDay, newYorkTemperature, newYorkPressure, newYorkWind);
-                    Log.d("LocationData", "Updating UI for NY");
-                } else if (url.equals(observationUrls[3])) { // Oman's URL
-                    updateViewsForLocation(observation, omanDay, omanTemperature, omanPressure, omanWind);
-                    Log.d("LocationData", "Updating UI for Oman");
-                } else if (url.equals(observationUrls[4])) { // Mauritius's URL
-                    updateViewsForLocation(observation, mauritiusDay, mauritiusTemperature, mauritiusPressure, mauritiusWind);
-                    Log.d("LocationData", "Updating UI for Mauritius");
-                } else if (url.equals(observationUrls[5])) { // Bangladesh's URL
-                    updateViewsForLocation(observation, bangladeshDay, bangladeshTemperature, bangladeshPressure, bangladeshWind);
-                    Log.d("LocationData", "Updating UI for Bangladesh");
-                }
+                updateViewsForLocation(observation, getViewMapping(url));
             }
         }
 
-        private void updateViewsForLocation(Observations observation, TextView dayView, TextView temperatureView, TextView pressureView, TextView windView) {
-            dayView.setText(String.format("%s", observation.getDay()));
-            temperatureView.setText(String.format("%s", observation.getTemperature()));
-            pressureView.setText(String.format("%s", observation.getPressure()));
-            windView.setText(String.format("%s", observation.getWindSpeed()));
-        }
-    }
-
-
-    private void parseDataO(InputStream in, CopyOnWriteArrayList<Observations> currentObservations) {
-        try {
-            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-            factory.setNamespaceAware(true);
-            XmlPullParser xpp = factory.newPullParser();
-            xpp.setInput(in, null);
-            int eventType = xpp.getEventType();
-            Observations newObservations = null;
-
-            while (eventType != XmlPullParser.END_DOCUMENT) {
-                if (eventType == XmlPullParser.START_TAG) {
-                    String namespace = xpp.getNamespace();
-                    String localName = xpp.getName();
-
-                    if ("item".equalsIgnoreCase(localName)) {
-                        newObservations = new Observations(); // Create new observation instance
-                    } else if (newObservations != null) {
-                        if ("title".equalsIgnoreCase(localName)) {
-                            String titleText = xpp.nextText();
-                            // Extract day, assuming it's the first word before the '-'
-                            String day = titleText.split(" -")[0];
-                            newObservations.setDay(day);
-                            Log.d("MyTag", "New item found!");
-                        } else if ("description".equalsIgnoreCase(localName)) {
-                            String descText = xpp.nextText();
-                            // Use regex or string manipulation to extract specific parts
-                            Pattern temperaturePattern = Pattern.compile("Temperature: (\\d+)(Â°C|°C)");
-                            Matcher temperatureMatcher = temperaturePattern.matcher(descText);
-                            if (temperatureMatcher.find()) {
-                                String temperatureWithUnit = temperatureMatcher.group(1) + "°C"; // Normalize the temperature string
-                                newObservations.setTemperature(temperatureWithUnit);
-                                Log.d("MyTag", "New item found!");
-                            }
-
-
-                            Pattern pressurePattern = Pattern.compile("Pressure: (\\d+mb)");
-                            Matcher pressureMatcher = pressurePattern.matcher(descText);
-                            if (pressureMatcher.find()) {
-                                newObservations.setPressure(pressureMatcher.group(1));
-                                Log.d("MyTag", "New item found!");
-                            }
-
-                            Pattern windSpeedPattern = Pattern.compile("Wind Speed: (\\d+mph)");
-                            Matcher windSpeedMatcher = windSpeedPattern.matcher(descText);
-                            if (windSpeedMatcher.find()) {
-                                newObservations.setWindSpeed(windSpeedMatcher.group(1));
-                                Log.d("MyTag", "New item found!");
-                            }
-                        }else if ("http://purl.org/dc/elements/1.1/".equals(namespace) && "date".equalsIgnoreCase(localName)) {
-                            String dateOnly = xpp.nextText();
-                            String dateText = dateOnly.split("T")[0];  //Splits at 'T' and takes the first part
-                            newObservations.setDate(dateText); // Set the date from the XML
-                            Log.d("MyTag", "Date set for observation: " + dateText);
-                        }
-                    }
-                } else if (eventType == XmlPullParser.END_TAG) {
-                    if ("item".equalsIgnoreCase(xpp.getName()) && currentObservations != null) {
-                        currentObservations.add(newObservations);
-                        newObservations = null;
-                    }
-                }
-                eventType = xpp.next();
+        private void updateViewsForLocation(Observations observation, TextView[] views) {
+            if (views != null && views.length == 4) { // Additional null check
+                views[0].setText(observation.getDay());
+                views[1].setText(observation.getTemperature());
+                views[2].setText(observation.getPressure());
+                views[3].setText(observation.getWindSpeed());
             }
-        } catch (XmlPullParserException e) {
-            Log.e("MyTag", "Parsing error" + e.toString());
-        } catch (IOException e) {
-            Log.e("MyTag", "IO error during parsing");
-        }
-    }
-
-    public class Task implements Runnable {
-        private String[] urls;
-        private ScheduledExecutorService scheduler;
-
-        public Task(String[] urls) {
-            this.urls = urls;
-            this.scheduler = Executors.newScheduledThreadPool(1);
         }
 
-        public void start() {
-            // Run immediately at the start in a new thread
-            new Thread(this::run).start();
-
-            // Calculate delay until next 08:00 or 20:00
-            long delay = calculateDelay();
-
-            // Schedule the task to run twice daily
-            scheduler.scheduleAtFixedRate(this, delay, 12, TimeUnit.HOURS);
+        private TextView[] getViewMapping(String url) {
+            return urlToTextViewsMap.get(url);
         }
 
-        private long calculateDelay() {
+        private long calculateNextRunDelay() {
             // Get the current time
             Calendar now = Calendar.getInstance();
 
@@ -809,45 +651,63 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             // Get the next 08:00 or 20:00, whichever is sooner
             Calendar nextRunTime = nextMorning.before(nextEvening) ? nextMorning : nextEvening;
 
-            // Calculate the delay until the next run time
-            long delay = nextRunTime.getTimeInMillis() - now.getTimeInMillis();
+            // Return the calculated delay until the next run time in milliseconds
+            return nextRunTime.getTimeInMillis() - now.getTimeInMillis();
+        }
+    }
+    private void updateDateDisplay() {
+        int currentIndex = weatherViewFlipper1.getDisplayedChild();
+        // Fetch the date from the observations map or similar structure.
+        CopyOnWriteArrayList<Observations> currentObservations = observationsMap.get(observationUrls[currentIndex]);
+        if (currentObservations != null && !currentObservations.isEmpty()) {
+            Observations latestObservation = currentObservations.get(0); // Observation is at index 0
+            dayDate.setText(latestObservation.getDate());
+            dayDate1.setText(latestObservation.getDate());
+        } else {
+            dayDate.setText("");
+            dayDate1.setText("");
+        }
+    }
 
-            // Return the delay in milliseconds
-            return delay;
+
+    public class ForecastThread implements Runnable {
+        private final String[] urls;
+        private final ScheduledExecutorService scheduler;
+        private final Handler mainHandler;
+
+        public ForecastThread(String[] urls, ScheduledExecutorService scheduler, Handler mainHandler) {
+            this.urls = urls;
+            this.scheduler = scheduler;
+            this.mainHandler = mainHandler;
+        }
+
+        public void start() {
+            // Immediate run in a separate thread to avoid blocking the caller
+            scheduler.execute(this);
+
+            // Calculate delay until next 08:00 or 20:00
+            long delay = calculateDelay();
+            // Schedule the task to run twice daily
+            scheduler.scheduleAtFixedRate(this, delay, 12, TimeUnit.HOURS);
         }
 
         @Override
         public void run() {
             Log.d("MyTag", "Forecast Task started");
-
             for (String url : urls) {
-                try {
-                    // Resolve URL to location name
-                    String locationName = getLocationNameFromUrl(url);
-
-                    // Fetch and parse data, then put it into the map
-                    forecastMap.put(locationName, fetchDataAndParse(url));
-
-                    runOnUiThread(() -> updateForecastViews(locationName, forecastMap.get(locationName)));
-
-                } catch (Exception e) {
-                    Log.e("MyTag", "Error in fetching or parsing data: " + e.getMessage());
-                }
+                processUrl(url);
             }
         }
 
-        private CopyOnWriteArrayList<ThreeDayForecast> fetchDataAndParse(String urlString) {
-            CopyOnWriteArrayList<ThreeDayForecast> currentForecasts = new CopyOnWriteArrayList<>();
+        private void processUrl(String url) {
             try {
-                URL url = new URL(urlString);
-                URLConnection yc = url.openConnection();
-                try (InputStream in = yc.getInputStream()) {
-                    parseDataF(in, currentForecasts); // Parse the input stream
-                }
-            } catch (IOException e) {
-                Log.e("MyTag", "IOException in fetchDataAndParse", e);
+                String locationName = getLocationNameFromUrl(url);
+                CopyOnWriteArrayList<ThreeDayForecast> forecasts = ForecastParser.fetchDataAndParse(url);
+                forecastMap.put(locationName, forecasts); // Update forecastMap with new data
+                mainHandler.post(() -> updateForecastViews(locationName, forecasts));
+            } catch (Exception e) {
+                Log.e("MyTag", "Error in fetching or parsing data: " + e.getMessage());
             }
-            return currentForecasts;
         }
 
         private void updateForecastViews(String locationName, CopyOnWriteArrayList<ThreeDayForecast> forecasts) {
@@ -909,11 +769,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
 
-        public void updateWeatherIcon(ImageView imageView, String weatherCondition) {
-            int resourceId = getIconResourceId(weatherCondition);
-            imageView.setImageResource(resourceId);
-        }
-
         private int getIconResourceId(String weatherCondition) {
             switch (weatherCondition) {
                 case "Sunny":
@@ -941,6 +796,38 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         }
 
+        private long calculateDelay() {
+            // Get the current time
+            Calendar now = Calendar.getInstance();
+
+            // Get the next 08:00
+            Calendar nextMorning = (Calendar) now.clone();
+            nextMorning.set(Calendar.HOUR_OF_DAY, 8);
+            nextMorning.set(Calendar.MINUTE, 0);
+            nextMorning.set(Calendar.SECOND, 0);
+
+            // If it's already past 08:00, get the next day's 08:00
+            if (now.after(nextMorning)) {
+                nextMorning.add(Calendar.DATE, 1);
+            }
+
+            // Get the next 20:00
+            Calendar nextEvening = (Calendar) now.clone();
+            nextEvening.set(Calendar.HOUR_OF_DAY, 20);
+            nextEvening.set(Calendar.MINUTE, 0);
+            nextEvening.set(Calendar.SECOND, 0);
+
+            // If it's already past 20:00, get the next day's 20:00
+            if (now.after(nextEvening)) {
+                nextEvening.add(Calendar.DATE, 1);
+            }
+
+            // Get the next 08:00 or 20:00, whichever is sooner
+            Calendar nextRunTime = nextMorning.before(nextEvening) ? nextMorning : nextEvening;
+
+            // Return the calculated delay until the next run time in milliseconds
+            return nextRunTime.getTimeInMillis() - now.getTimeInMillis();
+        }
     }
 
     private String getLocationNameFromUrl(String url) {
@@ -951,170 +838,5 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (url.equals(forecastUrls[4])) return "Mauritius";
         if (url.equals(forecastUrls[5])) return "Bangladesh";
         return null;
-    }
-
-
-    private void parseDataF(InputStream in, CopyOnWriteArrayList<ThreeDayForecast> currentForecasts) {
-        try {
-            XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
-            factory.setNamespaceAware(true);
-            XmlPullParser xpp = factory.newPullParser();
-            xpp.setInput(in, null);
-            int eventType = xpp.getEventType();
-            ThreeDayForecast newForecast = null;
-            String locationName = null;
-
-            while (eventType != XmlPullParser.END_DOCUMENT) {
-                if (eventType == XmlPullParser.START_TAG) {
-                    if (xpp.getName().equalsIgnoreCase("channel")) {
-                        // Parse the title to get the location name
-                        int nextEvent = xpp.next();
-                        if (nextEvent == XmlPullParser.TEXT) {
-                            String title = xpp.getText();
-                            locationName = title.replace("BBC Weather - Forecast for", "").trim();
-                        }
-                    } else if (xpp.getName().equalsIgnoreCase("item")) {
-                        newForecast = new ThreeDayForecast();
-                        newForecast.setLocationName(locationName);
-                    } else if (newForecast != null) {
-                        if (xpp.getName().equalsIgnoreCase("title")) {
-                            String title = xpp.nextText();
-                            Log.d("MyTag", "Parsing title: " + title); // Logging the title for debugging
-
-                            // Extracting day and condition
-                            String[] parts = title.split(",", 2);
-                            if (parts.length > 0) {
-                                String[] titleParts = parts[0].split(":", 2);
-                                if (titleParts.length == 2) {
-                                    newForecast.setDay(titleParts[0].trim());
-                                    newForecast.setWeatherCondition(titleParts[1].trim());
-                                }
-                            }
-
-                            // Initializing default values
-                            String minTemp = "N/A";
-                            String maxTemp = "N/A";
-
-                            // Attempt to parse temperatures
-                            if (title.contains("Minimum Temperature")) {
-                                try {
-                                    String[] tempParts = title.split("Minimum Temperature:")[1].split("Â°C")[0].trim().split(" ");
-                                    minTemp = tempParts[0];
-                                } catch (Exception e) {
-                                    Log.e("MyTag", "Error parsing minimum temperature", e);
-                                }
-                            }
-
-                            if (title.contains("Maximum Temperature")) {
-                                try {
-                                    String[] tempParts = title.split("Maximum Temperature:")[1].split("Â°C")[0].trim().split(" ");
-                                    maxTemp = tempParts[0];
-                                } catch (Exception e) {
-                                    Log.e("MyTag", "Error parsing maximum temperature", e);
-                                }
-                            }
-
-                            // Setting the temperatures
-                            newForecast.setMinimumTemperature(minTemp);
-                            newForecast.setMaximumTemperature(maxTemp);
-                            Log.d("MyTag", "Parsed temperatures - Min: " + minTemp + ", Max: " + maxTemp);
-
-                        } else if (xpp.getName().equalsIgnoreCase("description")) {
-                            String description = xpp.nextText();
-                            newForecast.setDescription(description);
-                            // Parse the description for various pieces of information
-                            parseDescription(description, newForecast);
-                        } else if (xpp.getName().equalsIgnoreCase("pubDate")) {
-                            newForecast.setDate(xpp.nextText());
-                        }
-                    }
-                } else if (eventType == XmlPullParser.END_TAG && xpp.getName().equalsIgnoreCase("item") && newForecast != null) {
-                    currentForecasts.add(newForecast);
-                    newForecast = null;
-                }
-                eventType = xpp.next();
-            }
-        } catch (XmlPullParserException | IOException e) {
-            Log.e("MyTag", "Error during parsing", e);
-        }
-        Log.d("MyTag", "End of document reached. Forecasts size: " + currentForecasts.size());
-    }
-    private void updateDateDisplay() {
-        int currentIndex = weatherViewFlipper1.getDisplayedChild();
-        // Fetch the date from the observations map or similar structure.
-        CopyOnWriteArrayList<Observations> currentObservations = observationsMap.get(observationUrls[currentIndex]);
-        if (currentObservations != null && !currentObservations.isEmpty()) {
-            Observations latestObservation = currentObservations.get(0); // Observation is at index 0
-            dayDate.setText(latestObservation.getDate());
-        } else {
-            dayDate.setText("");
-        }
-    }
-
-    private void parseDescription(String description, ThreeDayForecast forecast) {
-
-        // Wind Direction
-        Pattern windDirPattern = Pattern.compile("Wind Direction: (\\w+ \\w+)");
-        Matcher windDirMatcher = windDirPattern.matcher(description);
-        if (windDirMatcher.find()) {
-            forecast.setWindDirection(windDirMatcher.group(1));
-            Log.d("WeatherParse", "Parsed Wind Direction: " + windDirMatcher.group(1));
-        }
-
-        // Wind Speed
-        Pattern windSpeedPattern = Pattern.compile("Wind Speed: (\\d+)mph");
-        Matcher windSpeedMatcher = windSpeedPattern.matcher(description);
-        if (windSpeedMatcher.find()) {
-            forecast.setWindSpeed(windSpeedMatcher.group(1) + "mph");
-            Log.d("WeatherParse", "Parsed Wind Speed: " + windSpeedMatcher.group(1) + "mph");
-        }
-
-        // Visibility
-        Pattern visibilityPattern = Pattern.compile("Visibility: (\\w+)");
-        Matcher visibilityMatcher = visibilityPattern.matcher(description);
-        if (visibilityMatcher.find()) {
-            forecast.setVisibility(visibilityMatcher.group(1));
-            Log.d("WeatherParse", "Parsed Visibility: " + visibilityMatcher.group(1));
-        }
-
-        // Pressure
-        Pattern pressurePattern = Pattern.compile("Pressure: (\\d+)mb");
-        Matcher pressureMatcher = pressurePattern.matcher(description);
-        if (pressureMatcher.find()) {
-            forecast.setPressure(pressureMatcher.group(1) + "mb");
-            Log.d("WeatherParse", "Parsed Pressure: " + pressureMatcher.group(1) + "mb");
-        }
-
-        // Humidity
-        Pattern humidityPattern = Pattern.compile("Humidity: (\\d+)%");
-        Matcher humidityMatcher = humidityPattern.matcher(description);
-        if (humidityMatcher.find()) {
-            forecast.setHumidity(humidityMatcher.group(1) + "%");
-            Log.d("WeatherParse", "Parsed Humidity: " + humidityMatcher.group(1) + "%");
-        }
-
-        // UV Risk
-        Pattern uvRiskPattern = Pattern.compile("UV Risk: (\\d+)");
-        Matcher uvRiskMatcher = uvRiskPattern.matcher(description);
-        if (uvRiskMatcher.find()) {
-            forecast.setUvRisk(uvRiskMatcher.group(1));
-            Log.d("WeatherParse", "Parsed UV Risk: " + uvRiskMatcher.group(1));
-        }
-
-        // Pollution
-        Pattern pollutionPattern = Pattern.compile("Pollution: (\\w+)");
-        Matcher pollutionMatcher = pollutionPattern.matcher(description);
-        if (pollutionMatcher.find()) {
-            forecast.setPollution(pollutionMatcher.group(1));
-            Log.d("WeatherParse", "Parsed Pollution: " + pollutionMatcher.group(1));
-        }
-
-        // Sunset
-        Pattern sunsetPattern = Pattern.compile("Sunset: (\\d{2}:\\d{2} [A-Z]+)");
-        Matcher sunsetMatcher = sunsetPattern.matcher(description);
-        if (sunsetMatcher.find()) {
-            forecast.setSunset(sunsetMatcher.group(1));
-            Log.d("WeatherParse", "Parsed Sunset: " + sunsetMatcher.group(1));
-        }
     }
 }
