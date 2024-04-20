@@ -1,4 +1,4 @@
-<!--   MPD XML Sandra Maria Knapczyk S2334978  -->
+<!--   MPD XML landscape Sandra Maria Knapczyk S2334978  -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:map="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools" android:layout_width="fill_parent" android:layout_height="fill_parent" android:fillViewport="true" android:background="@color/SlateGray"
     android:id="@+id/mainView">
     <!--  Starting Screen Layout  -->
@@ -6,6 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/viewSwitcher">
+        <!--  Screen for observations-->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -29,6 +30,7 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:baselineAligned="false">
+                <!-- Layout for spinner and view flipper  -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -604,6 +606,7 @@
                         </LinearLayout>
                     </ViewFlipper>
                 </LinearLayout>
+                <!--  Layout for maps and navigation buttons   -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
@@ -665,6 +668,7 @@
                 </LinearLayout>
             </LinearLayout>
         </LinearLayout>
+        <!--  Screen for forecats -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -674,6 +678,7 @@
                 android:layout_height="match_parent"
                 android:orientation="horizontal"
                 android:baselineAligned="false">
+                <!--  View Flipper for forecasts  -->
                 <ViewFlipper
                     android:id="@+id/weatherFlipper2"
                     android:layout_width="match_parent"
@@ -1814,6 +1819,7 @@
                         </LinearLayout>
                     </LinearLayout>
                 </ViewFlipper>
+                <!--  Layout for date, launching apps and navigation buttons  -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"

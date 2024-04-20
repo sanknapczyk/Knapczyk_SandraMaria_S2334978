@@ -14,7 +14,17 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/*
+ * Sandra Maria Knapczyk
+ * Student ID: S2334978
+ * MPD CW1
+ */
 public class ForecastParser {
+    /**
+     * Fetches and parses forecast data from a given URL.
+     * @param urlString The URL to fetch forecast XML data from.
+     * @return A list of ThreeDayForecast objects containing parsed forecast data.
+     */
     public static CopyOnWriteArrayList<ThreeDayForecast> fetchDataAndParse(String urlString) {
         CopyOnWriteArrayList<ThreeDayForecast> currentForecasts = new CopyOnWriteArrayList<>();
         try {
@@ -31,6 +41,11 @@ public class ForecastParser {
         return currentForecasts;
     }
 
+    /**
+     * Parses the XML input stream and populates a list of forecast data.
+     * @param in The input stream from which to read the XML data.
+     * @param currentForecasts The list to populate with parsed forecast data.
+     */
     private static void parseDataF(InputStream in, CopyOnWriteArrayList<ThreeDayForecast> currentForecasts) {
         try {
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
@@ -117,9 +132,16 @@ public class ForecastParser {
         Log.d("MyTag", "End of document reached. Forecasts size: " + currentForecasts.size());
     }
 
+    /**
+     * Parses the description text from a weather forecast XML feed to extract detailed weather conditions
+     * and set them into the provided ThreeDayForecast object.
+     *
+     * @param description The string containing all weather condition data.
+     * @param forecast The ThreeDayForecast object to populate with parsed data.
+     */
     private static void parseDescription(String description, ThreeDayForecast forecast) {
 
-        // Wind Direction
+        // Extract wind direction using a regex pattern and set it on the forecast object
         Pattern windDirPattern = Pattern.compile("Wind Direction: (\\w+ \\w+)");
         Matcher windDirMatcher = windDirPattern.matcher(description);
         if (windDirMatcher.find()) {
@@ -127,7 +149,7 @@ public class ForecastParser {
             Log.d("WeatherParse", "Parsed Wind Direction: " + windDirMatcher.group(1));
         }
 
-        // Wind Speed
+        // Extract wind speed using a regex pattern and set it on the forecast object
         Pattern windSpeedPattern = Pattern.compile("Wind Speed: (\\d+)mph");
         Matcher windSpeedMatcher = windSpeedPattern.matcher(description);
         if (windSpeedMatcher.find()) {
@@ -135,7 +157,7 @@ public class ForecastParser {
             Log.d("WeatherParse", "Parsed Wind Speed: " + windSpeedMatcher.group(1) + "mph");
         }
 
-        // Visibility
+        // Extract visibility using a regex pattern and set it on the forecast object
         Pattern visibilityPattern = Pattern.compile("Visibility: (\\w+)");
         Matcher visibilityMatcher = visibilityPattern.matcher(description);
         if (visibilityMatcher.find()) {
@@ -143,7 +165,7 @@ public class ForecastParser {
             Log.d("WeatherParse", "Parsed Visibility: " + visibilityMatcher.group(1));
         }
 
-        // Pressure
+        // Extract atmospheric pressure using a regex pattern and set it on the forecast object
         Pattern pressurePattern = Pattern.compile("Pressure: (\\d+)mb");
         Matcher pressureMatcher = pressurePattern.matcher(description);
         if (pressureMatcher.find()) {
@@ -151,7 +173,7 @@ public class ForecastParser {
             Log.d("WeatherParse", "Parsed Pressure: " + pressureMatcher.group(1) + "mb");
         }
 
-        // Humidity
+        // Extract humidity level using a regex pattern and set it on the forecast object
         Pattern humidityPattern = Pattern.compile("Humidity: (\\d+)%");
         Matcher humidityMatcher = humidityPattern.matcher(description);
         if (humidityMatcher.find()) {
@@ -159,7 +181,7 @@ public class ForecastParser {
             Log.d("WeatherParse", "Parsed Humidity: " + humidityMatcher.group(1) + "%");
         }
 
-        // UV Risk
+        // Extract UV risk level using a regex pattern and set it on the forecast object
         Pattern uvRiskPattern = Pattern.compile("UV Risk: (\\d+)");
         Matcher uvRiskMatcher = uvRiskPattern.matcher(description);
         if (uvRiskMatcher.find()) {
@@ -167,7 +189,7 @@ public class ForecastParser {
             Log.d("WeatherParse", "Parsed UV Risk: " + uvRiskMatcher.group(1));
         }
 
-        // Pollution
+        // Extract pollution level using a regex pattern and set it on the forecast object
         Pattern pollutionPattern = Pattern.compile("Pollution: (\\w+)");
         Matcher pollutionMatcher = pollutionPattern.matcher(description);
         if (pollutionMatcher.find()) {
@@ -175,7 +197,7 @@ public class ForecastParser {
             Log.d("WeatherParse", "Parsed Pollution: " + pollutionMatcher.group(1));
         }
 
-        // Sunset
+        // Extract sunset time using a regex pattern and set it on the forecast object
         Pattern sunsetPattern = Pattern.compile("Sunset: (\\d{2}:\\d{2} [A-Z]+)");
         Matcher sunsetMatcher = sunsetPattern.matcher(description);
         if (sunsetMatcher.find()) {
@@ -183,4 +205,5 @@ public class ForecastParser {
             Log.d("WeatherParse", "Parsed Sunset: " + sunsetMatcher.group(1));
         }
     }
+
 }
